@@ -1,0 +1,214 @@
+--------------------------------------------------
+
+Finished Goods Packaging Kanban System
+Developer: Vince Dale Alcantara
+
+--------------------------------------------------
+
+NOTES
+
+--------------------------------------------------
+
+End Users
+
+- FGP PIC
+	+ Admin Functions
+	+ Kanban Masterlist
+	+ Kanban Printing
+	+ Inventory
+- Production (Requestor)
+	+ Request Items
+	+ History
+
+--------------------------------------------------
+
+Functions
+
+PRODUCTION (Requestor)
+Request Items (Section)
+- Request Packaging Items (Scan Kanban)
+- Pending Item Request Table
+- Ongoing Item Request Table
+- Section History
+
+FGP PIC
+
+Inventory
+- Store In and Transfer (History Insert and Inventory Update)
+- Store In / Out History
+- Total Inventory
+
+Requested Items
+- Kanban Printing
+- Pending Requested Item Table
+- Ongoing Requested Item Table
+- Requested Item Search
+- Section History
+
+ADMIN
+Administration
+- Accounts Management
+	+ Admin/FG Account
+	+ Distributor Account
+
+Kanban Masterlist
+- Kanban Registration (Insert, Update, Generate Kanban)
+- Kanban Printing
+- Request Search
+- Kanban History
+
+Kanban Misc
++ Route Number
++ Truck Number
+- Sections / Scooter Area
+
+Inventory
+- Items
+- Suppliers
+- Storage Area (Area 1, Area2, Scrap Area, Container)
+
+--------------------------------------------------
+
+Database Tables
+
+- account
+- distributor_account
+- distributor_remarks
+- inventory
+- items
+- kanban_history
+- kanban_masterlist
+- notification_count
+- route_no
+- scanned_kanban
+- scooter_area
+- storage_area
+- store_in_history
+- store_out_history
+- suppliers
+- truck_no
+
+--------------------------------------------------
+
+PROCESS FLOW (Admin)
+
+Accounts Management
+Distributors
+Route Numbers
+Truck Numbers
+Stock Areas (Area 1, Area2, Scrap Area, Container)
+Sections
+Items
+Suppliers
+
+Kanban Masterlist (Admin - FG Warehouse)
+1. Insert Kanban
+2. Update Kanban
+
+Kanban Printing (Admin - FG Warehouse)
+
+--------------------------------------------------
+
+PROCESS FLOW (Requestor / Distributor)
+
+Request Items (Requestor - Sections)
+How to request item
+1. Login Distributor Account - Scan ID (id_no)
+2. Scan Kanban
+3. Update distributor remarks
+4. Item Requested. pending request table
+
+--------------------------------------------------
+
+PROCESS FLOW (FGP)
+
+Requested Items (FGP - FG Warehouse Area 1 & 2)
+How to set Pending to Ongoing
+1. Select Row on Pending Request Table
+2. Set as Ongoing
+3. Item Request Ongoing. ongoing request table
+
+Kanban Printing (FGP - FG Warehouse Area 1 & 2)
+
+Store Out (FGP - FG Warehouse Area 1 & 2)
+How to store out request
+1. Select Row on Ongoing Request Table
+2. Set as Store Out
+3. Item Request Ready for delivery. kanban history table
+
+Store In/Transfer via Inventory (FGP - FG Warehouse Area 1 & 2)
+1. Fill out form
+2. Confirm
+
+Store Out via Item Request
+1. Item Request Process (Requestor - Sections)
+	+ Login Distributor Account - Scan ID (id_no)
+	+ Scan Kanban
+	+ Update distributor remarks
+	+ Item Requested. pending request table
+2. Requested Item Pending to Ongoing (FGP - FG Warehouse Area 1 & 2)
+	+ Select Row on Pending Request Table
+	+ Set as Ongoing
+	+ Item Request Ongoing. ongoing request table
+3. Request Item Ongoing to Store Out (FGP - FG Warehouse Area 1 & 2)
+	+ Select Row on Ongoing Request Table
+	+ Set as Store Out
+	+ Item Request Ready for delivery. kanban history table
+
+--------------------------------------------------
+
+CLIENT REQUEST 
+
+- Daily Report to Accounting (Store in & out) Export CSV
+- Inventory Warning (Table row change in color -- red if the quantity is near empty)
+- Before inserting on db about store in, include Invoice Number, Supplier name, ... as inputs
+- Kanban Data (Item name, Dimension, Size, Color, Supplier name, Route no, Line no, Scooter area, etc.)
+- Transfer packaging items from stock area to another
+- requesting limit on scanning kanban (using date or limit request like after 4hrs to scan kanban on that item again)
+- requesting limit on scanning kanban (update request limit quantity per day)
+
+--------------------------------------------------
+# --------------------------------------------------
+# FG Packaging Kanban System - Printing Settings
+# --------------------------------------------------
+# Thermal Print Settings
+# Devices and Printers
+# Look for EPSON TM-T82X Receipt Printer
+# Right Click and choose Printing Preferences
+# SET this Printing Preferences FIRST Before Thermal Printing !!!
+# --------------------------------------------------
+# Ctrl + Shift + P (On Browser)
+# Select Printer : EPSON TM-T82X Receipt
+# Preferences (Layout)
+# Orientation : Landscape
+# Advanced (Layout)
+# Paper Size: Postcard 100 X 148 mm
+# Leave all settings except paper size
+# Preferences (Feed and Cut)
+# Preset option: Page[Feed, Cut]
+# --------------------------------------------------
+# Ctrl + P
+# Destination : EPSON TM-T82X Receipt
+# More Settings
+# Paper Size : Postcard 100 x 148 mm
+# Margins : Minimum
+# Scale: Custom = 90
+# Options: Check Background Graphics
+# SET Printing Preferences on Devices and Printers FIRST Before Thermal Printing !!!
+# Note that the default Preset Option is Document[Feed, Cut]
+# Make sure it is Page[Feed, Cut]
+
+# Normal Print Settings
+# Ctrl + P
+# Destination : EPSON Printer (Any)
+# More Settings
+# Paper Size : A4
+# Pages per sheet : 2
+# Margins : Default
+# Scale: Default
+# Options: Check Background Graphics
+
+
+Temporary IP Address for debugging
+$ip = '172.25.114.229'; // Section 1
+$ip = '172.25.167.172'; // FG
