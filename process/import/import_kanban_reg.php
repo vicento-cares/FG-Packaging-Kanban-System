@@ -4,8 +4,8 @@ session_name("fg-pkg-debug");
 session_start();
 
 if (!isset($_SESSION['username'])) {
-  header('location:../../admin/');
-  exit;
+    header('location:../../admin/');
+    exit;
 }
 
 error_reporting(0); // comment this line to see errors
@@ -22,17 +22,18 @@ $date_updated = date('Y-m-d H:i:s');
 $date_generated = date("ymdHis");
 
 $batch_no = date("ymdh");
-$rand = substr(md5(microtime()),rand(0,26),5);
-$batch_no = 'BAT:'.$batch_no;
-$batch_no = $batch_no.''.$rand;
+$rand = substr(md5(microtime()), rand(0, 26), 5);
+$batch_no = 'BAT:' . $batch_no;
+$batch_no = $batch_no . '' . $rand;
 
-function get_items($conn) {
+function get_items($conn)
+{
     $data = array();
 
     $sql = "SELECT item_no, item_name FROM items ORDER BY item_no ASC";
-    $stmt = $conn -> prepare($sql);
-    $stmt -> execute();
-    while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         array_push($data, $row['item_no']);
         array_push($data, $row['item_name']);
     }
@@ -40,40 +41,43 @@ function get_items($conn) {
     return $data;
 }
 
-function get_lines($conn) {
+function get_lines($conn)
+{
     $data = array();
 
     $sql = "SELECT line_no FROM route_no ORDER BY line_no ASC";
-    $stmt = $conn -> prepare($sql);
-    $stmt -> execute();
-    while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         array_push($data, $row['line_no']);
     }
-    
+
     return $data;
 }
 
-function get_storage_areas($conn) {
+function get_storage_areas($conn)
+{
     $data = array();
 
     $sql = "SELECT storage_area FROM storage_area ORDER BY storage_area ASC";
-    $stmt = $conn -> prepare($sql);
-    $stmt -> execute();
-    while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         array_push($data, $row['storage_area']);
     }
-    
+
     return $data;
 }
 
 // Get Section
-function get_section_by_line_no($line_no, $conn) {
+function get_section_by_line_no($line_no, $conn)
+{
     $sql = "SELECT section FROM route_no WHERE line_no = ?";
-    $stmt = $conn -> prepare($sql);
+    $stmt = $conn->prepare($sql);
     $params = array($line_no);
-    $stmt -> execute($params);
-    if ($stmt -> rowCount() > 0) {
-        foreach($stmt -> fetchAll() as $row) {
+    $stmt->execute($params);
+    if ($stmt->rowCount() > 0) {
+        foreach ($stmt->fetchAll() as $row) {
             return $row['section'];
         }
     } else {
@@ -82,20 +86,22 @@ function get_section_by_line_no($line_no, $conn) {
 }
 
 // Remove UTF-8 BOM
-function removeBomUtf8($s){
-    if (substr($s,0,3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
-        return substr($s,3);
+function removeBomUtf8($s)
+{
+    if (substr($s, 0, 3) == chr(hexdec('EF')) . chr(hexdec('BB')) . chr(hexdec('BF'))) {
+        return substr($s, 3);
     } else {
         return $s;
     }
 }
 
-function count_row ($file) {
+function count_row($file)
+{
     $linecount = -2;
     $handle = fopen($file, "r");
-    while(!feof($handle)){
-      $line = fgets($handle);
-      $linecount++;
+    while (!feof($handle)) {
+        $line = fgets($handle);
+        $linecount++;
     }
 
     fclose($handle);
@@ -103,9 +109,10 @@ function count_row ($file) {
     return $linecount;
 }
 
-function check_csv ($file, $conn) {
+function check_csv($file, $conn)
+{
     // READ FILE
-    $csvFile = fopen($file,'r');
+    $csvFile = fopen($file, 'r');
 
     // SKIP FIRST LINE
     $first_line = fgets($csvFile);
@@ -116,13 +123,16 @@ function check_csv ($file, $conn) {
     $line_no_arr = get_lines($conn);
     $storage_area_arr = get_storage_areas($conn);
 
-    $hasError = 0; $hasBlankError = 0; $isExistsOnDb = 0; $isDuplicateOnCsv = 0;
+    $hasError = 0;
+    $hasBlankError = 0;
+    $isExistsOnDb = 0;
+    $isDuplicateOnCsv = 0;
     $hasBlankErrorArr = array();
     $isExistsOnDbArr = array();
     $isDuplicateOnCsvArr = array();
     $dup_temp_arr = array();
 
-    $row_valid_arr = array(0,0,0,0,0,0,0,0,0);
+    $row_valid_arr = array(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     $notValidItemNoArr = array();
     $notValidItemNameArr = array();
@@ -148,7 +158,7 @@ function check_csv ($file, $conn) {
             }
 
             $check_csv_row++;
-            
+
             $line_no = strtoupper(custom_trim($line[0]));
             $storage_area = custom_trim($line[1]);
             $item_no = str_pad(custom_trim($line[2]), 5, '0', STR_PAD_LEFT);
@@ -158,7 +168,7 @@ function check_csv ($file, $conn) {
             $color = addslashes(custom_trim($line[6]));
             $quantity = intval(custom_trim($line[7]));
             $req_limit = custom_trim($line[8]);
-            
+
             $is_valid_item_no = validate_item_no($item_no);
             $is_valid_item_name = validate_item_name($item_name);
             $is_valid_line_no = validate_line_no($line_no);
@@ -236,9 +246,9 @@ function check_csv ($file, $conn) {
             WHERE item_no = '$item_no' AND item_name = '$item_name' AND line_no = '$line_no'
             AND dimension = '$dimension' AND size = '$size' AND color = '$color'
             AND quantity = '$quantity' AND storage_area = '$storage_area'";
-            $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
-            if ($stmt -> rowCount() > 0) {
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
                 $isExistsOnDb = 1;
                 $hasError = 1;
                 array_push($isExistsOnDbArr, $check_csv_row);
@@ -247,7 +257,7 @@ function check_csv ($file, $conn) {
     } else {
         $message = $message . 'Invalid CSV Table Header. Maybe an incorrect CSV file or incorrect CSV header ';
     }
-    
+
     fclose($csvFile);
 
     if ($hasError == 1) {
@@ -296,7 +306,7 @@ $mimes = array('text/x-comma-separated-values', 'text/comma-separated-values', '
 
 if (!empty($_FILES['file']['name'])) {
 
-    if (in_array($_FILES['file']['type'],$mimes)) {
+    if (in_array($_FILES['file']['type'], $mimes)) {
 
         if (is_uploaded_file($_FILES['file']['tmp_name'])) {
 
@@ -322,11 +332,11 @@ if (!empty($_FILES['file']['name'])) {
                         foreach ($words as $w) {
                             $acronym .= mb_substr($w, 0, 1);
                         }
-                        $kanban = $item_name_generated.'_'.$section_generated.'_'.$line_no.'_'.$acronym.'_'.custom_trim($read_data[7]).'_'.$item_no.'_'.$date_generated;
+                        $kanban = $item_name_generated . '_' . $section_generated . '_' . $line_no . '_' . $acronym . '_' . custom_trim($read_data[7]) . '_' . $item_no . '_' . $date_generated;
                         $kanban_no = 0;
-                        $rand2 = substr(md5(microtime()),rand(0,26),5);
-                        $rand3 = substr(md5(microtime()),rand(0,26),5);
-                        $serial_no = 'SN-'.$rand2.''.$item_no.''.$rand3;
+                        $rand2 = substr(md5(microtime()), rand(0, 26), 5);
+                        $rand3 = substr(md5(microtime()), rand(0, 26), 5);
+                        $serial_no = 'SN-' . $rand2 . '' . $item_no . '' . $rand3;
 
                         $route_no = get_route_number($line_no, $conn);
 
@@ -355,19 +365,19 @@ if (!empty($_FILES['file']['name'])) {
                             $subsql = substr($subsql, 0, strlen($subsql) - 3);
                             $insertsql = $insertsql . $subsql . ";";
                             $insertsql = substr($insertsql, 0, strlen($insertsql));
-                            $stmt = $conn -> prepare($insertsql);
-                            $stmt -> execute();
+                            $stmt = $conn->prepare($insertsql);
+                            $stmt->execute();
                             $insertsql = "INSERT INTO kanban_masterlist (batch_no, kanban, kanban_no, serial_no, line_no, storage_area, item_no, item_name, dimension, size, color, quantity, req_limit, section, req_limit_qty, route_no, date_updated) VALUES ";
                             $subsql = "";
                         } else if ($temp_count == $row_count) {
                             $subsql = substr($subsql, 0, strlen($subsql) - 3);
                             $insertsql2 = $insertsql . $subsql . ";";
                             $insertsql2 = substr($insertsql2, 0, strlen($insertsql2));
-                            $stmt = $conn -> prepare($insertsql2);
-                            $stmt -> execute();
+                            $stmt = $conn->prepare($insertsql2);
+                            $stmt->execute();
                         }
                     }
-                    
+
                     fclose($csv_file);
 
                 } else {
@@ -391,4 +401,3 @@ if (!empty($_FILES['file']['name'])) {
 }
 
 $conn = null;
-?>
