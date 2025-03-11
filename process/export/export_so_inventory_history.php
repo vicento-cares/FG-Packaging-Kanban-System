@@ -33,7 +33,7 @@ $item_name = $_GET['item_name'];
 $remarks = $_GET['remarks'];
 $storage_area = $_GET['storage_area'];
 
-$sql = "SELECT * FROM `store_out_history` WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' ";
+$sql = "SELECT * FROM store_out_history WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' ";
 if ($storage_area != 'All') {
     $sql = $sql . "AND storage_area = '$storage_area' ";
 }

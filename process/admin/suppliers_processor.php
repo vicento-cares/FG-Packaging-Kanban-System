@@ -12,7 +12,7 @@ $method = $_POST['method'];
 $date_updated = date('Y-m-d H:i:s');
 
 function check_existing_supplier($supplier_name, $conn) {
-	$sql = "SELECT `id` FROM `suppliers` WHERE supplier_name = ?";
+	$sql = "SELECT id FROM suppliers WHERE supplier_name = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($supplier_name);
 	$stmt -> execute($params);
@@ -24,7 +24,7 @@ function check_existing_supplier($supplier_name, $conn) {
 }
 
 function get_supplier_name($id, $conn) {
-	$sql = "SELECT `supplier_name` FROM `suppliers` WHERE id = ?";
+	$sql = "SELECT supplier_name FROM suppliers WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);
@@ -34,7 +34,7 @@ function get_supplier_name($id, $conn) {
 }
 
 function update_supplier_name_on_kanban($supplier_name, $old_supplier_name, $conn) {
-	$sql = "UPDATE `kanban_masterlist` SET `supplier_name` = ? WHERE supplier_name = ?";
+	$sql = "UPDATE kanban_masterlist SET supplier_name = ? WHERE supplier_name = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($supplier_name, $old_supplier_name);
 	$stmt -> execute($params);
@@ -42,7 +42,7 @@ function update_supplier_name_on_kanban($supplier_name, $old_supplier_name, $con
 
 // Get Supplier Dropdown
 if ($method == 'fetch_suppliers_dropdown') {
-	$sql = "SELECT `supplier_name` FROM `suppliers` GROUP BY(supplier_name) ORDER BY id ASC";
+	$sql = "SELECT supplier_name FROM suppliers GROUP BY(supplier_name) ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -57,7 +57,7 @@ if ($method == 'fetch_suppliers_dropdown') {
 
 // Get Supplier Dropdown
 if ($method == 'fetch_suppliers_dropdown_fg') {
-	$sql = "SELECT `supplier_name` FROM `suppliers` GROUP BY(supplier_name) ORDER BY id ASC";
+	$sql = "SELECT supplier_name FROM suppliers GROUP BY(supplier_name) ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -73,7 +73,7 @@ if ($method == 'fetch_suppliers_dropdown_fg') {
 // Count
 if ($method == 'count_data') {
 	$search = $_POST['search'];
-	$sql = "SELECT count(id) AS total FROM `suppliers`";
+	$sql = "SELECT count(id) AS total FROM suppliers";
 	if (!empty($search)) {
 		$sql = $sql . " WHERE supplier_name LIKE '$search%'";
 	}
@@ -91,7 +91,7 @@ if ($method == 'fetch_data') {
 	$id = $_POST['id'];
 	$search = $_POST['search'];
 	$c = $_POST['c'];
-	$sql = "SELECT `id`, `supplier_name`, `date_updated` FROM `suppliers`";
+	$sql = "SELECT id, supplier_name, date_updated FROM suppliers";
 
 	if (!empty($id) && empty($search)) {
 		$sql = $sql . " WHERE id > '$id'";
@@ -129,7 +129,7 @@ if ($method == 'save_data') {
 	if ($is_valid_supplier == true) {
 		$is_duplicate = check_existing_supplier($supplier_name, $conn);
 		if ($is_duplicate == false) {
-			$sql = "INSERT INTO `suppliers` (`supplier_name`, `date_updated`) VALUES (?, ?)";
+			$sql = "INSERT INTO suppliers (supplier_name, date_updated) VALUES (?, ?)";
 			$stmt = $conn -> prepare($sql);
 			$params = array($supplier_name, $date_updated);
 			$stmt -> execute($params);
@@ -153,7 +153,7 @@ if ($method == 'update_data') {
 		$old_supplier_name = get_supplier_name($id, $conn);
 		$is_existing = check_existing_supplier($supplier_name, $conn);
 		if ($is_existing == false) {
-			$sql = "UPDATE `suppliers` SET `supplier_name`= ?, `date_updated`= ? WHERE `id`= ?";
+			$sql = "UPDATE suppliers SET supplier_name = ?, date_updated = ? WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($supplier_name, $date_updated, $id);
 			$stmt -> execute($params);
@@ -171,7 +171,7 @@ if ($method == 'update_data') {
 if ($method == 'delete_data') {
 	$id = $_POST['id'];
 
-	$sql = "DELETE FROM `suppliers` WHERE id = ?";
+	$sql = "DELETE FROM suppliers WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);

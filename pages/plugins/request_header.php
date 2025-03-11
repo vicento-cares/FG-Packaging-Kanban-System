@@ -7,7 +7,7 @@ require('../process/lib/main.php');
 
 // Delete Recent Scanned Kanban -- In case of browser refresh
 function delete_recent_scanned($section, $conn) {
-  $sql = "DELETE FROM `scanned_kanban` WHERE section = ? AND status = 'Scanned'";
+  $sql = "DELETE FROM scanned_kanban WHERE section = ? AND status = 'Scanned'";
   $stmt = $conn -> prepare($sql);
   $params = array($section);
   $stmt -> execute($params);
@@ -15,7 +15,7 @@ function delete_recent_scanned($section, $conn) {
 
 // Delete Recent Requestor Remarks on Scanned Kanban -- In case of browser refresh
 function delete_recent_remarks_scanned($section, $conn) {
-  $sql = "DELETE FROM `requestor_remarks` WHERE section = ? AND requestor_status = 'Scanned'";
+  $sql = "DELETE FROM requestor_remarks WHERE section = ? AND requestor_status = 'Scanned'";
   $stmt = $conn -> prepare($sql);
   $params = array($section);
   $stmt -> execute($params);

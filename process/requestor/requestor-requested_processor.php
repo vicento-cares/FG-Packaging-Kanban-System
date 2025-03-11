@@ -49,7 +49,7 @@ function count_request_group($section, $status, $conn) {
 function fetch_section_dropdown_fg($section, $status, $conn) {
 	$section_selected = $section;
 	$dropdown = '';
-	$sql = "SELECT COUNT(request_id) AS `request_id` FROM `scanned_kanban` WHERE status = ? GROUP BY request_id";
+	$sql = "SELECT COUNT(request_id) AS request_id FROM scanned_kanban WHERE status = ? GROUP BY request_id";
 	$stmt = $conn -> prepare($sql);
 	$params = array($status);
 	$stmt -> execute($params);
@@ -59,12 +59,12 @@ function fetch_section_dropdown_fg($section, $status, $conn) {
 		$dropdown = $dropdown . '<option value="All">All Sections &#160;&#160;&#160;---&#160;&#160;&#160; (&#160;'.$stmt -> rowCount().'&#160;)</option>';
 	}
 
-	$sql = "SELECT `section` FROM `section` GROUP BY section ORDER BY section ASC";
+	$sql = "SELECT section FROM section GROUP BY section ORDER BY section ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	foreach($stmt -> fetchAll() as $row) {
 		$section = $row['section'];
-		$sql1 = "SELECT COUNT(request_id) AS `request_id`, `section` FROM `scanned_kanban` WHERE section = ? AND status = ? GROUP BY request_id ORDER BY section ASC";
+		$sql1 = "SELECT COUNT(request_id) AS request_id, section FROM scanned_kanban WHERE section = ? AND status = ? GROUP BY request_id ORDER BY section ASC";
 		$stmt1 = $conn -> prepare($sql1);
 		$params = array($section, $status);
 		$stmt1 -> execute($params);
@@ -84,14 +84,14 @@ function request_mark_as_read($request_id, $status, $user, $section, $conn) {
 	$update_notif = true;
 	$sql = "";
 	if ($status == 'Stored Out') {
-		$sql = "UPDATE `kanban_history` SET is_read = 1";
+		$sql = "UPDATE kanban_history SET is_read = 1";
 	} else if ($user == 'requestor') {
-		$sql = "UPDATE `scanned_kanban` SET is_read = 1";
+		$sql = "UPDATE scanned_kanban SET is_read = 1";
 		if ($status == 'Pending') {
 			$update_notif = false;
 		}
 	} else if ($user == 'fg') {
-		$sql = "UPDATE `scanned_kanban` SET is_read_fg = 1";
+		$sql = "UPDATE scanned_kanban SET is_read_fg = 1";
 		if ($status == 'Ongoing') {
 			$update_notif = false;
 		}
@@ -102,14 +102,14 @@ function request_mark_as_read($request_id, $status, $user, $section, $conn) {
 	$stmt -> execute($params);
 
 	if ($update_notif == true) {
-		$sql = "UPDATE `notification_count`";
+		$sql = "UPDATE notification_count";
 		if (empty($section)) {
 			$section = 'ADMIN-FG';
-			$sql = $sql . " SET `pending` = CASE WHEN pending > 0 THEN pending - 1 END";
+			$sql = $sql . " SET pending = CASE WHEN pending > 0 THEN pending - 1 END";
 		} else if ($status == 'Stored Out') {
-			$sql = $sql . " SET `store_out` = CASE WHEN store_out > 0 THEN store_out - 1 END";
+			$sql = $sql . " SET store_out = CASE WHEN store_out > 0 THEN store_out - 1 END";
 		} else {
-			$sql = $sql . " SET `ongoing` = CASE WHEN ongoing > 0 THEN ongoing - 1 END";
+			$sql = $sql . " SET ongoing = CASE WHEN ongoing > 0 THEN ongoing - 1 END";
 		}
 		$sql = $sql . " WHERE interface = ?";
 		$stmt = $conn -> prepare($sql);
@@ -120,7 +120,7 @@ function request_mark_as_read($request_id, $status, $user, $section, $conn) {
 
 // Check Inventory Quantity on Pending
 function check_inventory_pending($quantity, $item_no, $storage_area, $conn) {
-	$sql = "SELECT `quantity`, `safety_stock` FROM `inventory` WHERE item_no = ? AND storage_area = ?";
+	$sql = "SELECT quantity, safety_stock FROM inventory WHERE item_no = ? AND storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($item_no, $storage_area);
 	$stmt -> execute($params);
@@ -145,7 +145,7 @@ function check_inventory_ongoing($requested_arr, $conn) {
 	$storage_area = '';
 	$inv_limit_reached = false;
 	foreach ($requested_arr as $id) {
-		$sql = "SELECT `item_no`, `quantity`, `storage_area` FROM `scanned_kanban` WHERE id = ?";
+		$sql = "SELECT item_no, quantity, storage_area FROM scanned_kanban WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($id);
 		$stmt -> execute($params);
@@ -155,7 +155,7 @@ function check_inventory_ongoing($requested_arr, $conn) {
 			$storage_area = $row['storage_area'];
 		}
 		
-		$sql = "SELECT `quantity`, `safety_stock` FROM `inventory` WHERE item_no = ? AND storage_area = ?";
+		$sql = "SELECT quantity, safety_stock FROM inventory WHERE item_no = ? AND storage_area = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($item_no, $storage_area);
 		$stmt -> execute($params);
@@ -182,7 +182,7 @@ function check_inventory_ongoing($requested_arr, $conn) {
 }
 
 function get_inventory_quantity($item_no, $storage_area, $conn) {
-	$sql = "SELECT `quantity` FROM `inventory` WHERE item_no = ? AND storage_area = ?";
+	$sql = "SELECT quantity FROM inventory WHERE item_no = ? AND storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($item_no, $storage_area);
 	$stmt -> execute($params);
@@ -192,7 +192,7 @@ function get_inventory_quantity($item_no, $storage_area, $conn) {
 }
 
 function update_notif_count($section, $status, $conn) {
-	$sql = "UPDATE `notification_count`";
+	$sql = "UPDATE notification_count";
 	if ($status == 'Ongoing') {
 		$sql = $sql . " SET ongoing = ongoing + 1";
 	} else if ($status == 'Stored Out') {
@@ -209,7 +209,7 @@ function insert_to_history($ongoing_request_arr, $store_out_person, $conn) {
 	$store_out_time = date('H:i');
 	$store_out_date_time = date('Y-m-d H:i:s');
 	$truck_no = get_truck_number($ongoing_request_arr['section'], $ongoing_request_arr['line_no'], $store_out_time, $conn);
-	$sql = "INSERT INTO `kanban_history`(`request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `route_no`, `truck_no`, `requestor_id_no`, `requestor_name`, `requestor`, `scan_date_time`, `request_date_time`, `store_out_date_time`, `store_out_person`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Stored Out')";
+	$sql = "INSERT INTO kanban_history(request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, section, route_no, truck_no, requestor_id_no, requestor_name, requestor, scan_date_time, request_date_time, store_out_date_time, store_out_person, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Stored Out')";
 	$stmt = $conn -> prepare($sql);
 	$params = array($ongoing_request_arr['request_id'], $ongoing_request_arr['kanban'], $ongoing_request_arr['kanban_no'], $ongoing_request_arr['serial_no'], $ongoing_request_arr['item_no'], $ongoing_request_arr['item_name'], $ongoing_request_arr['line_no'], $ongoing_request_arr['quantity'], $ongoing_request_arr['storage_area'], $ongoing_request_arr['section'], $ongoing_request_arr['route_no'], $truck_no, $ongoing_request_arr['requestor_id_no'], $ongoing_request_arr['requestor_name'], $ongoing_request_arr['requestor'], $ongoing_request_arr['scan_date_time'], $ongoing_request_arr['request_date_time'], $store_out_date_time, $store_out_person);
 	$stmt -> execute($params);
@@ -221,7 +221,7 @@ function insert_to_history($ongoing_request_arr, $store_out_person, $conn) {
 	$inv_after = get_inventory_quantity($ongoing_request_arr['item_no'], $ongoing_request_arr['storage_area'], $conn);
 	$inv_on_hand = $inv_after + $inv_out;
 
-	$sql = "INSERT INTO `store_out_history`(`request_id`, `item_no`, `item_name`, `quantity`, `storage_area`, `to_storage_area`, `remarks`, `inv_out`, `inv_on_hand`, `inv_after`, `store_out_date_time`) VALUES (?, ?, ?, ?, ?, 'N/A', ?, ?, ?, ?, ?)";
+	$sql = "INSERT INTO store_out_history(request_id, item_no, item_name, quantity, storage_area, to_storage_area, remarks, inv_out, inv_on_hand, inv_after, store_out_date_time) VALUES (?, ?, ?, ?, ?, 'N/A', ?, ?, ?, ?, ?)";
 	$stmt = $conn -> prepare($sql);
 	$params = array($ongoing_request_arr['request_id'], $ongoing_request_arr['item_no'], $ongoing_request_arr['item_name'], $ongoing_request_arr['quantity'], $ongoing_request_arr['storage_area'], $remarks, $inv_out, $inv_on_hand, $inv_after, $store_out_date_time);
 	$stmt -> execute($params);
@@ -236,7 +236,7 @@ function update_kanban_no($kanban, $serial_no, $conn) {
 
 // Get Kanban History ID for printing
 function get_kanban_history_id($request_id, $kanban, $serial_no, $conn) {
-	$sql = "SELECT `id` FROM kanban_history WHERE request_id = ? AND kanban = ? AND serial_no = ?";
+	$sql = "SELECT id FROM kanban_history WHERE request_id = ? AND kanban = ? AND serial_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id, $kanban, $serial_no);
 	$stmt -> execute($params);
@@ -247,14 +247,14 @@ function get_kanban_history_id($request_id, $kanban, $serial_no, $conn) {
 
 // Delete ongoing request
 function delete_ongoing($id, $conn) {
-	$sql = "DELETE FROM `scanned_kanban` WHERE id = ?";
+	$sql = "DELETE FROM scanned_kanban WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);
 }
 
 function set_requestor_remarks_to_history($request_id, $kanban, $serial_no, $conn) {
-	$sql = "UPDATE `requestor_remarks` SET requestor_status = 'History' WHERE request_id = ? AND kanban = ? AND serial_no = ?";
+	$sql = "UPDATE requestor_remarks SET requestor_status = 'History' WHERE request_id = ? AND kanban = ? AND serial_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id, $kanban, $serial_no);
 	$stmt -> execute($params);
@@ -268,7 +268,7 @@ if ($method == 'display_pending_on_section') {
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-primary');
 	$row_class = $row_class_arr[0];
 	$data = '';
-	$sql = "SELECT `request_id`, COUNT(kanban) AS `kanban`, `section`, `requestor_name`, `request_date_time`, `status`, `is_read` FROM `scanned_kanban` WHERE section = ? AND status = 'Pending' GROUP BY(request_id) ORDER BY id DESC";
+	$sql = "SELECT request_id, COUNT(kanban) AS kanban, section, requestor_name, request_date_time, status, is_read FROM scanned_kanban WHERE section = ? AND status = 'Pending' GROUP BY(request_id) ORDER BY id DESC";
 	$stmt = $conn -> prepare($sql);
 	$params = array($section);
 	$stmt -> execute($params);
@@ -306,7 +306,7 @@ if ($method == 'display_ongoing_on_section') {
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-warning');
 	$row_class = $row_class_arr[0];
 	$data = '';
-	$sql = "SELECT `request_id`, COUNT(kanban) AS `kanban`, `section`, `requestor_name`, `request_date_time`, `status`, `is_read` FROM `scanned_kanban` WHERE section = ? AND status = 'Ongoing' GROUP BY(request_id) ORDER BY is_read ASC, id DESC";
+	$sql = "SELECT request_id, COUNT(kanban) AS kanban, section, requestor_name, request_date_time, status, is_read FROM scanned_kanban WHERE section = ? AND status = 'Ongoing' GROUP BY(request_id) ORDER BY is_read ASC, id DESC";
 	$stmt = $conn -> prepare($sql);
 	$params = array($section);
 	$stmt -> execute($params);
@@ -342,7 +342,7 @@ if ($method == 'display_so_on_section') {
 	$section = $_POST['section'];
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-success');
 	$row_class = $row_class_arr[0];
-	$sql = "SELECT `request_id`, COUNT(kanban) AS `kanban`, `section`, `requestor_name`, `request_date_time`, `status`, `is_read` FROM `kanban_history` WHERE section = ? AND status = 'Stored Out' GROUP BY(request_id) ORDER BY is_read ASC, id DESC LIMIT 50";
+	$sql = "SELECT request_id, COUNT(kanban) AS kanban, section, requestor_name, request_date_time, status, is_read FROM kanban_history WHERE section = ? AND status = 'Stored Out' GROUP BY(request_id) ORDER BY is_read ASC, id DESC LIMIT 50";
 	$stmt = $conn -> prepare($sql);
 	$params = array($section);
 	$stmt -> execute($params);
@@ -377,7 +377,7 @@ if ($method == 'display_pending_on_fg') {
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-primary');
 	$row_class = $row_class_arr[0];
 	$data = '';
-	$sql = "SELECT `request_id`, COUNT(kanban) AS `kanban`, `section`, `requestor_name`, `request_date_time`, `status`, `is_read_fg` FROM `scanned_kanban` WHERE status = ?";
+	$sql = "SELECT request_id, COUNT(kanban) AS kanban, section, requestor_name, request_date_time, status, is_read_fg FROM scanned_kanban WHERE status = ?";
 	$params = array($status);
 	if ($section != 'All') {
 		$sql = $sql . " AND section = ?";
@@ -422,7 +422,7 @@ if ($method == 'display_ongoing_on_fg') {
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-warning');
 	$row_class = $row_class_arr[0];
 	$data = '';
-	$sql = "SELECT `request_id`, COUNT(kanban) AS `kanban`, `section`, `requestor_name`, `request_date_time`, `status`, `is_read_fg` FROM `scanned_kanban` WHERE status = ?";
+	$sql = "SELECT request_id, COUNT(kanban) AS kanban, section, requestor_name, request_date_time, status, is_read_fg FROM scanned_kanban WHERE status = ?";
 	$params = array($status);
 	if ($section != 'All') {
 		$sql = $sql . " AND section = ?";
@@ -467,7 +467,7 @@ if ($method == 'view_pending_request_details') {
 	$is_history = false;
 	$is_read = 1;
 	$status = 'Pending';
-	$sql = "SELECT `id`, `request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `requestor_name`, `scan_date_time`, `request_date_time`, `status`, `is_read` FROM `scanned_kanban` WHERE request_id = ? AND status = 'Pending' ORDER BY id ASC";
+	$sql = "SELECT id, request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, section, requestor_name, scan_date_time, request_date_time, status, is_read FROM scanned_kanban WHERE request_id = ? AND status = 'Pending' ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
@@ -513,7 +513,7 @@ if ($method == 'view_ongoing_request_details') {
 	$is_history = true;
 	$is_read = 1;
 	$status = 'Ongoing';
-	$sql = "SELECT `id`, `request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `requestor_name`, `scan_date_time`, `request_date_time`, `status`, `is_read` FROM `scanned_kanban` WHERE request_id = ? AND status = 'Ongoing' ORDER BY id ASC";
+	$sql = "SELECT id, request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, section, requestor_name, scan_date_time, request_date_time, status, is_read FROM scanned_kanban WHERE request_id = ? AND status = 'Ongoing' ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
@@ -559,7 +559,7 @@ if ($method == 'view_so_request_details') {
 	$is_history = true;
 	$is_read = 1;
 	$status = 'Stored Out';
-	$sql = "SELECT `id`, `request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `route_no`, `truck_no`, `requestor_name`, `scan_date_time`, `request_date_time`, `store_out_date_time`, `status`, `is_read` FROM `kanban_history` WHERE request_id = ? AND status = 'Stored Out' ORDER BY id ASC";
+	$sql = "SELECT id, request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, section, route_no, truck_no, requestor_name, scan_date_time, request_date_time, store_out_date_time, status, is_read FROM kanban_history WHERE request_id = ? AND status = 'Stored Out' ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
@@ -606,7 +606,7 @@ if ($method == 'view_pending_requested_details') {
 	$status = 'Pending';
 	$row_class_arr = array('', 'table-danger');
 	$row_class = $row_class_arr[0];
-	$sql = "SELECT `id`, `request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `requestor_name`, `scan_date_time`, `request_date_time`, `status`, `is_read_fg` FROM `scanned_kanban` WHERE request_id = ? AND status = 'Pending' ORDER BY id ASC";
+	$sql = "SELECT id, request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, requestor_name, scan_date_time, request_date_time, status, is_read_fg FROM scanned_kanban WHERE request_id = ? AND status = 'Pending' ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
@@ -656,7 +656,7 @@ if ($method == 'view_ongoing_requested_details') {
 	$is_history = false;
 	$is_read_fg = 1;
 	$status = 'Ongoing';
-	$sql = "SELECT `id`, `request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `requestor_name`, `scan_date_time`, `request_date_time`, `status`, `is_read_fg` FROM `scanned_kanban` WHERE request_id = ? AND status = 'Ongoing' ORDER BY id ASC";
+	$sql = "SELECT id, request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, requestor_name, scan_date_time, request_date_time, status, is_read_fg FROM scanned_kanban WHERE request_id = ? AND status = 'Ongoing' ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
@@ -711,14 +711,14 @@ if ($method == 'mark_as_ongoing_request_arr') {
 
 	if ($check_inventory_ongoing == 'success') {
 
-		$sql = "SELECT `id` FROM `scanned_kanban` WHERE request_id = ? AND status = ?";
+		$sql = "SELECT id FROM scanned_kanban WHERE request_id = ? AND status = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($request_id, $status);
 		$stmt -> execute($params);
 		$ongoing_count = $stmt -> rowCount();
 
 		foreach ($requested_arr as $id) {
-			$sql = "SELECT `item_no`, `item_name`, `quantity`, `storage_area`, `section` FROM `scanned_kanban` WHERE id = ?";
+			$sql = "SELECT item_no, item_name, quantity, storage_area, section FROM scanned_kanban WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($id);
 			$stmt -> execute($params);
@@ -730,12 +730,12 @@ if ($method == 'mark_as_ongoing_request_arr') {
 				$section = $row['section'];
 			}
 
-			$sql = "UPDATE `scanned_kanban` SET status = ?, is_read = 0, is_read_fg = 0 WHERE id = ?";
+			$sql = "UPDATE scanned_kanban SET status = ?, is_read = 0, is_read_fg = 0 WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($status, $id);
 			$stmt -> execute($params);
 
-			$sql = "UPDATE `inventory` SET quantity = quantity - ? WHERE item_no = ? AND item_name = ? AND storage_area = ?";
+			$sql = "UPDATE inventory SET quantity = quantity - ? WHERE item_no = ? AND item_name = ? AND storage_area = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($quantity, $item_no, $item_name, $storage_area);
 			$stmt -> execute($params);
@@ -745,13 +745,13 @@ if ($method == 'mark_as_ongoing_request_arr') {
 		if ($ongoing_count < 1) {
 			update_notif_count($section, $status, $conn);
 		} else {
-			$sql = "SELECT `id` FROM `scanned_kanban` WHERE request_id = ? AND status = ? AND is_read = 1";
+			$sql = "SELECT id FROM scanned_kanban WHERE request_id = ? AND status = ? AND is_read = 1";
 			$stmt = $conn -> prepare($sql);
 			$params = array($request_id, $status);
 			$stmt -> execute($params);
 			$is_read_row_count = $stmt -> rowCount();
 
-			$sql = "UPDATE `scanned_kanban` SET is_read = 0, is_read_fg = 0 WHERE request_id = ? AND status = ?";
+			$sql = "UPDATE scanned_kanban SET is_read = 0, is_read_fg = 0 WHERE request_id = ? AND status = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($request_id, $status);
 			$stmt -> execute($params);
@@ -787,14 +787,14 @@ if ($method == 'store_out_requested_arr') {
 	$message = '';
 	$error = 0;
 
-	$sql = "SELECT `id` FROM `kanban_history` WHERE request_id = ?";
+	$sql = "SELECT id FROM kanban_history WHERE request_id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
 	$stored_out_count = $stmt -> rowCount();
 
 	foreach ($requested_arr as $id) {
-		$sql = "SELECT `request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `route_no`, `requestor_id_no`, `requestor_name`, `requestor`, `scan_date_time`, `request_date_time`, `status` FROM `scanned_kanban` WHERE id = ? ORDER BY id ASC";
+		$sql = "SELECT request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, section, route_no, requestor_id_no, requestor_name, requestor, scan_date_time, request_date_time, status FROM scanned_kanban WHERE id = ? ORDER BY id ASC";
 		$stmt = $conn -> prepare($sql);
 		$params = array($id);
 		$stmt -> execute($params);
@@ -835,13 +835,13 @@ if ($method == 'store_out_requested_arr') {
 	if ($stored_out_count < 1) {
 		update_notif_count($ongoing_request_arr['section'], $status, $conn);
 	} else {
-		$sql = "SELECT `id` FROM `kanban_history` WHERE request_id = ? AND is_read = 1";
+		$sql = "SELECT id FROM kanban_history WHERE request_id = ? AND is_read = 1";
 		$stmt = $conn -> prepare($sql);
 		$params = array($request_id);
 		$stmt -> execute($params);
 		$is_read_row_count = $stmt -> rowCount();
 
-		$sql = "UPDATE `kanban_history` SET is_read = 0 WHERE request_id = ?";
+		$sql = "UPDATE kanban_history SET is_read = 0 WHERE request_id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($request_id);
 		$stmt -> execute($params);
@@ -902,7 +902,7 @@ if ($method == 'get_request_searched') {
 	$item_name = $_POST['item_name'];
 	$section = $_POST['section'];
 	$status = $_POST['status'];
-	$sql = "SELECT `id`, `request_id`, `kanban_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `scan_date_time`, `request_date_time` FROM scanned_kanban";
+	$sql = "SELECT id, request_id, kanban_no, item_no, item_name, line_no, quantity, storage_area, section, scan_date_time, request_date_time FROM scanned_kanban";
 	if (empty($id)) {
 		if ($section == 'All') {
 			$sql = $sql . " WHERE line_no LIKE '$line_no%' AND item_no LIKE '$item_no%' AND item_name LIKE '$item_name%' AND status = '$status' AND (request_date_time >= '$request_date_from' AND request_date_time <= '$request_date_to') ORDER BY id DESC LIMIT 25";

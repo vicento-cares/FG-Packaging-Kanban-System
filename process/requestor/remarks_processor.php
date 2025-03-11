@@ -12,7 +12,7 @@ if (!isset($_POST['method'])) {
 $method = $_POST['method'];
 
 function get_request_date_time($request_id, $conn) {
-	$sql = "SELECT `request_date_time` FROM `scanned_kanban` WHERE request_id = ?";
+	$sql = "SELECT request_date_time FROM scanned_kanban WHERE request_id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
@@ -29,7 +29,7 @@ if ($method == 'get_requestor_remarks') {
 	$requestor_remarks = '';
 	$requestor_date_time = 'N/A';
 	
-	$sql = "SELECT `id`, `requestor_remarks`, `requestor_date_time` FROM `requestor_remarks` WHERE request_id = ? AND kanban = ? AND serial_no = ?";
+	$sql = "SELECT id, requestor_remarks, requestor_date_time FROM requestor_remarks WHERE request_id = ? AND kanban = ? AND serial_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id, $kanban, $serial_no);
 	$stmt -> execute($params);
@@ -73,7 +73,7 @@ if ($method == 'save_requestor_remarks') {
 			$requestor_status = 'Requested';
 			$request_date_time = get_request_date_time($request_id, $conn);
 		}
-		$sql = "INSERT INTO `requestor_remarks` (`request_id`, `kanban`, `kanban_no`, `serial_no`, `section`, `scan_date_time`, `request_date_time`, `requestor_remarks`, `requestor_date_time`, `requestor_status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		$sql = "INSERT INTO requestor_remarks (request_id, kanban, kanban_no, serial_no, section, scan_date_time, request_date_time, requestor_remarks, requestor_date_time, requestor_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		$stmt = $conn -> prepare($sql);
 		$params = array($request_id, $kanban, $kanban_no, $serial_no, $section, $scan_date_time, $request_date_time, $requestor_remarks, $requestor_date_time, $requestor_status);
 		$stmt -> execute($params);
@@ -89,7 +89,7 @@ if ($method == 'update_requestor_remarks') {
 	$requestor_date_time = date('Y-m-d H:i:s');
 
 	if (!empty($requestor_remarks) && $requestor_remarks != ' ') {
-		$sql = "UPDATE `requestor_remarks` SET requestor_remarks = ?, requestor_date_time = ? WHERE id = ?";
+		$sql = "UPDATE requestor_remarks SET requestor_remarks = ?, requestor_date_time = ? WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($requestor_remarks, $requestor_date_time, $id);
 		$stmt -> execute($params);

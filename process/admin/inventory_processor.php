@@ -11,7 +11,7 @@ if (!isset($_POST['method'])) {
 $method = $_POST['method'];
 
 function get_last_rir_id($conn) {
-	$sql = "SELECT `rir_id` FROM `store_in_history` ORDER BY rir_id + 0 DESC LIMIT 1";
+	$sql = "SELECT rir_id FROM store_in_history ORDER BY rir_id + 0 DESC LIMIT 1";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -24,7 +24,7 @@ function get_last_rir_id($conn) {
 }
 
 function check_existing_store_in($is_exists_arr, $conn) {
-	$sql = "SELECT `id` FROM `store_in_history` WHERE invoice_no = ? AND po_no = ? AND dr_no = ? AND storage_area = ?";
+	$sql = "SELECT id FROM store_in_history WHERE invoice_no = ? AND po_no = ? AND dr_no = ? AND storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($is_exists_arr['invoice_no'], $is_exists_arr['po_no'], $is_exists_arr['dr_no'], $is_exists_arr['storage_area']);
 	$stmt -> execute($params);
@@ -36,7 +36,7 @@ function check_existing_store_in($is_exists_arr, $conn) {
 }
 
 function get_inventory_quantity($item_no, $storage_area, $conn) {
-	$sql = "SELECT `quantity` FROM `inventory` WHERE item_no = ? AND storage_area = ?";
+	$sql = "SELECT quantity FROM inventory WHERE item_no = ? AND storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($item_no, $storage_area);
 	$stmt -> execute($params);
@@ -46,7 +46,7 @@ function get_inventory_quantity($item_no, $storage_area, $conn) {
 }
 
 function check_inventory_quantity($item_no, $storage_area, $quantity, $conn) {
-	$sql = "SELECT `quantity` FROM `inventory` WHERE item_no = ? AND storage_area = ?";
+	$sql = "SELECT quantity FROM inventory WHERE item_no = ? AND storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($item_no, $storage_area);
 	$stmt -> execute($params);
@@ -61,7 +61,7 @@ function check_inventory_quantity($item_no, $storage_area, $quantity, $conn) {
 }
 
 function update_inventory_transfer($item_no, $to_storage_area, $quantity, $conn) {
-	$sql = "UPDATE `inventory` SET quantity = quantity + ? WHERE item_no = ? AND storage_area = ?";
+	$sql = "UPDATE inventory SET quantity = quantity + ? WHERE item_no = ? AND storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($quantity, $item_no, $to_storage_area);
 	$stmt -> execute($params);
@@ -72,7 +72,7 @@ if ($method == 'count_inventory') {
 	$storage_area = $_POST['storage_area'];
 	$item_no = $_POST['item_no'];
 	$item_name = addslashes($_POST['item_name']);
-	$sql = "SELECT count(id) AS total FROM `inventory`";
+	$sql = "SELECT count(id) AS total FROM inventory";
 	if ($storage_area == 'All') {
 		$sql = $sql . " WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%'";
 	} else {
@@ -96,7 +96,7 @@ if ($method == 'get_inventory') {
 	$c = $_POST['c'];
 	$row_class = '';
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-warning', 'modal-trigger table-danger');
-	$sql = "SELECT `id`, `item_no`, `item_name`, `storage_area`, `quantity`, `safety_stock` FROM `inventory`";
+	$sql = "SELECT id, item_no, item_name, storage_area, quantity, safety_stock FROM inventory";
 
 	if (empty($id)) {
 		if ($storage_area == 'All') {
@@ -219,12 +219,12 @@ if ($method == 'store_in') {
 			echo 'Exists';
 		}*/
 
-		$sql = "INSERT INTO `store_in_history` (`rir_id`, `invoice_no`, `po_no`, `dr_no`, `item_no`, `item_name`, `supplier_name`, `quantity`, `storage_area`, `reason`, `inv_received`, `inv_on_hand`, `inv_after`, `store_in_date_time`,  `delivery_date_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		$sql = "INSERT INTO store_in_history (rir_id, invoice_no, po_no, dr_no, item_no, item_name, supplier_name, quantity, storage_area, reason, inv_received, inv_on_hand, inv_after, store_in_date_time,  delivery_date_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		$stmt = $conn -> prepare($sql);
 		$params = array($rir_id, $invoice_no, $po_no, $dr_no, $item_no, $item_name, $supplier_name, $quantity, $storage_area, $reason, $inv_received, $inv_on_hand, $inv_after, $store_in_date_time, $delivery_date_time);
 		$stmt -> execute($params);
 
-		$sql = "UPDATE `inventory` SET quantity = quantity + ? WHERE item_no = ? AND storage_area = ?";
+		$sql = "UPDATE inventory SET quantity = quantity + ? WHERE item_no = ? AND storage_area = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($quantity, $item_no, $storage_area);
 		$stmt -> execute($params);
@@ -269,12 +269,12 @@ if ($method == 'transfer') {
 		$can_store_out = check_inventory_quantity($item_no, $storage_area, $quantity, $conn);
 
 		if ($can_store_out == 1) {
-			$sql = "INSERT INTO `store_out_history` (`request_id`, `item_no`, `item_name`, `quantity`, `storage_area`, `to_storage_area`, `remarks`, `inv_out`, `inv_on_hand`, `inv_after`, `store_out_date_time`) VALUES ('N/A', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			$sql = "INSERT INTO store_out_history (request_id, item_no, item_name, quantity, storage_area, to_storage_area, remarks, inv_out, inv_on_hand, inv_after, store_out_date_time) VALUES ('N/A', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			$stmt = $conn -> prepare($sql);
 			$params = array($item_no, $item_name, $quantity, $storage_area, $to_storage_area, $remarks, $inv_out, $inv_on_hand, $inv_after, $store_out_date_time);
 			$stmt -> execute($params);
 
-			$sql = "UPDATE `inventory` SET quantity = quantity - ? WHERE item_no = ? AND storage_area = ?";
+			$sql = "UPDATE inventory SET quantity = quantity - ? WHERE item_no = ? AND storage_area = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($quantity, $item_no, $storage_area);
 			$stmt -> execute($params);
@@ -293,7 +293,7 @@ if ($method == 'update_safety_stock') {
 	$safety_stock = intval($_POST['safety_stock']);
 
 	if ($safety_stock != '' && $safety_stock > -1) {
-		$sql = "UPDATE `inventory` SET `safety_stock`= ? WHERE `id`= ?";
+		$sql = "UPDATE inventory SET safety_stock = ? WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($safety_stock, $id);
 		$stmt -> execute($params);

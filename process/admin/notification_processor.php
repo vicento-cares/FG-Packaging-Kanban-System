@@ -10,7 +10,7 @@ if (!isset($_POST['method'])) {
 $method = $_POST['method'];
 
 if ($method == 'count_notif_fg') {
-	$sql = "SELECT `pending` FROM `notification_count` WHERE interface = 'ADMIN-FG'";
+	$sql = "SELECT pending FROM notification_count WHERE interface = 'ADMIN-FG'";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -25,7 +25,7 @@ if ($method == 'count_notif_section') {
 	$ongoing = 0;
 	$store_out = 0;
 	$total = 0;
-	$sql = "SELECT `ongoing`, `store_out` FROM `notification_count` WHERE interface = ?";
+	$sql = "SELECT ongoing, store_out FROM notification_count WHERE interface = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($section);
 	$stmt -> execute($params);
@@ -47,14 +47,14 @@ if ($method == 'count_notif_section') {
 }
 
 if ($method == 'update_notif_fg') {
-	$sql = "UPDATE `notification_count` SET `pending` = 0 WHERE interface = 'ADMIN-FG'";
+	$sql = "UPDATE notification_count SET pending = 0 WHERE interface = 'ADMIN-FG'";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 }
 
 if ($method == 'update_notif_section') {
 	$section = $_POST['section'];
-	$sql = "UPDATE `notification_count` SET `ongoing` = 0, `store_out` = 0 WHERE interface = ?";
+	$sql = "UPDATE notification_count SET ongoing = 0, store_out = 0 WHERE interface = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($section);
 	$stmt -> execute($params);

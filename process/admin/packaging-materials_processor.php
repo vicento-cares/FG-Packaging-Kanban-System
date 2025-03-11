@@ -12,7 +12,7 @@ $method = $_POST['method'];
 $date_updated = date('Y-m-d H:i:s');
 
 function get_last_item_no($conn) {
-	$sql = "SELECT `item_no` FROM `inventory` ORDER BY item_no DESC LIMIT 1";
+	$sql = "SELECT item_no FROM inventory ORDER BY item_no DESC LIMIT 1";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
@@ -23,10 +23,10 @@ function get_last_item_no($conn) {
 function insert_item_on_inventory($item_no, $item_name, $conn) {
 	$quantity = 0;
 	$safety_stock = 0;
-	$sql1 = "INSERT INTO `inventory`(`item_no`, `item_name`, `storage_area`, `quantity`, `safety_stock`) VALUES ";
+	$sql1 = "INSERT INTO inventory(item_no, item_name, storage_area, quantity, safety_stock) VALUES ";
 	$subsql1 = "";
 	$temp_count = 0;
-	$sql = "SELECT `storage_area` FROM `storage_area`";
+	$sql = "SELECT storage_area FROM storage_area";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	$row_count = $stmt -> rowCount();
@@ -40,7 +40,7 @@ function insert_item_on_inventory($item_no, $item_name, $conn) {
 			$sql1 = substr($sql1, 0, strlen($sql1));
 			$stmt1 = $conn -> prepare($sql1);
 			$stmt1 -> execute();
-			$sql1 = "INSERT INTO `inventory`(`item_no`, `item_name`, `storage_area`, `quantity`, `safety_stock`) VALUES ";
+			$sql1 = "INSERT INTO inventory(item_no, item_name, storage_area, quantity, safety_stock) VALUES ";
 			$subsql1 = "";
 		} else if ($temp_count == $row_count) {
 			$subsql1 = substr($subsql1, 0, strlen($subsql1) - 3);
@@ -53,7 +53,7 @@ function insert_item_on_inventory($item_no, $item_name, $conn) {
 }
 
 function check_existing_item_name($item_name, $conn) {
-	$sql = "SELECT `id` FROM `items` WHERE item_name = ?";
+	$sql = "SELECT id FROM items WHERE item_name = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($item_name);
 	$stmt -> execute($params);
@@ -65,22 +65,22 @@ function check_existing_item_name($item_name, $conn) {
 }
 
 function change_item_name($id, $item_name, $item_no, $conn) {
-	$sql = "SELECT `item_name` FROM `items` WHERE `item_name`= ?";
+	$sql = "SELECT item_name FROM items WHERE item_name = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($item_name);
 	$stmt -> execute($params);
 	if ($stmt -> rowCount() <= 0) {
-		$sql = "UPDATE `items` SET `item_name`= ? WHERE `id`= ?";
+		$sql = "UPDATE items SET item_name = ? WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($item_name, $id);
 		$stmt -> execute($params);
 
-		$sql = "UPDATE `inventory` SET `item_name`= ? WHERE `item_no`= ?";
+		$sql = "UPDATE inventory SET item_name = ? WHERE item_no = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($item_name, $item_no);
 		$stmt -> execute($params);
 		
-		$sql = "UPDATE `kanban_masterlist` SET `item_name`= ? WHERE `item_no`= ?";
+		$sql = "UPDATE kanban_masterlist SET item_name = ? WHERE item_no = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($item_name, $item_no);
 		$stmt -> execute($params);
@@ -88,7 +88,7 @@ function change_item_name($id, $item_name, $item_no, $conn) {
 }
 
 function check_existing_item_name_update($id, $item_name, $conn) {
-	$sql = "SELECT `id` FROM `items` WHERE id != ? AND item_name = ?";
+	$sql = "SELECT id FROM items WHERE id != ? AND item_name = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id, $item_name);
 	$stmt -> execute($params);
@@ -100,7 +100,7 @@ function check_existing_item_name_update($id, $item_name, $conn) {
 }
 
 function check_inventory_item_delete($item_no, $conn) {
-	$sql = "SELECT `quantity` FROM `inventory` WHERE item_no = ?";
+	$sql = "SELECT quantity FROM inventory WHERE item_no = ?";
 	$message = false;
 	$stmt = $conn -> prepare($sql);
 	$params = array($item_no);
@@ -114,7 +114,7 @@ function check_inventory_item_delete($item_no, $conn) {
 }
 
 function check_kanban_item_delete($item_no, $conn) {
-	$sql = "SELECT `id` FROM `kanban_masterlist` WHERE item_no = ?";
+	$sql = "SELECT id FROM kanban_masterlist WHERE item_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($item_no);
 	$stmt -> execute($params);
@@ -127,7 +127,7 @@ function check_kanban_item_delete($item_no, $conn) {
 
 // Get Items Dropdown
 if ($method == 'fetch_items_dropdown') {
-	$sql = "SELECT `item_no`, `item_name` FROM `items` GROUP BY(item_name) ORDER BY item_name ASC";
+	$sql = "SELECT item_no, item_name FROM items GROUP BY(item_name) ORDER BY item_name ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -141,7 +141,7 @@ if ($method == 'fetch_items_dropdown') {
 }
 
 if ($method == 'fetch_items_datalist') {
-	$sql = "SELECT `item_name` FROM `items` GROUP BY(item_name) ORDER BY item_name ASC";
+	$sql = "SELECT item_name FROM items GROUP BY(item_name) ORDER BY item_name ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -159,7 +159,7 @@ if ($method == 'get_item_details') {
 	$quantity = 0;
 
 	if (!empty($item_no)) {
-		$sql = "SELECT `dimension`, `size`, `color`, `pcs_bundle` FROM `items` WHERE item_no = ?";
+		$sql = "SELECT dimension, size, color, pcs_bundle FROM items WHERE item_no = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($item_no);
 		$stmt -> execute($params);
@@ -186,7 +186,7 @@ if ($method == 'get_item_details') {
 // Count
 if ($method == 'count_data') {
 	$search = $_POST['search'];
-	$sql = "SELECT count(id) AS total FROM `items`";
+	$sql = "SELECT count(id) AS total FROM items";
 	if (!empty($search)) {
 		$sql = $sql . " WHERE item_no LIKE '%$search%' OR item_name LIKE '$search%'";
 	}
@@ -204,7 +204,7 @@ if ($method == 'fetch_data') {
 	$id = $_POST['id'];
 	$search = $_POST['search'];
 	$c = $_POST['c'];
-	$sql = "SELECT `id`, `item_no`, `item_name`, `dimension`, `size`, `color`, `pcs_bundle`, `req_quantity`, `date_updated` FROM `items`";
+	$sql = "SELECT id, item_no, item_name, dimension, size, color, pcs_bundle, req_quantity, date_updated FROM items";
 
 	if (!empty($id) && empty($search)) {
 		$sql = $sql . " WHERE id > '$id'";
@@ -289,7 +289,7 @@ if ($method == 'save_data') {
 				$item_no = str_pad($item_no, 5, '0', STR_PAD_LEFT);
 			}
 
-			$sql = "INSERT INTO `items` (`item_no`, `item_name`, `dimension`, `size`, `color`, `pcs_bundle`, `req_quantity`, `date_updated`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			$sql = "INSERT INTO items (item_no, item_name, dimension, size, color, pcs_bundle, req_quantity, date_updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 			$stmt = $conn -> prepare($sql);
 			$params = array($item_no, $item_name, $dimension, $size, $color, $pcs_bundle, $req_quantity, $date_updated);
 			$stmt -> execute($params);
@@ -345,7 +345,7 @@ if ($method == 'update_data') {
 		if ($is_existing == false) {
 			change_item_name($id, $item_name, $item_no, $conn);
 
-			$sql = "UPDATE `items` SET `dimension`= ?, `size`= ?, `color`= ?, `pcs_bundle`= ?, `req_quantity`= ?, `date_updated`= ? WHERE `id`= ?";
+			$sql = "UPDATE items SET dimension = ?, size = ?, color = ?, pcs_bundle = ?, req_quantity = ?, date_updated = ? WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($dimension, $size, $color, $pcs_bundle, $req_quantity, $date_updated, $id);
 			$stmt -> execute($params);
@@ -366,12 +366,12 @@ if ($method == 'delete_data') {
 
 	if ($has_inventory == false) {
 		if ($has_kanban == false) {
-			$sql = "DELETE FROM `inventory` WHERE item_no = ?";
+			$sql = "DELETE FROM inventory WHERE item_no = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($item_no);
 			$stmt -> execute($params);
 
-			$sql = "DELETE FROM `items` WHERE id = ?";
+			$sql = "DELETE FROM items WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($id);
 			$stmt -> execute($params);

@@ -36,7 +36,7 @@ $item_name = $_GET['item_name'];
 $section = $_GET['section'];
 $status = $_GET['status'];
 
-$sql = "SELECT `id`, `request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `requestor_name`, `requestor`, `scan_date_time`, `request_date_time` FROM scanned_kanban";
+$sql = "SELECT id, request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, section, requestor_name, requestor, scan_date_time, request_date_time FROM scanned_kanban";
 if ($section == 'All') {
     $sql = $sql . " WHERE line_no LIKE '$line_no%' AND item_no LIKE '$item_no%' AND item_name LIKE '$item_name%' AND status = '$status' AND (request_date_time >= '$request_date_from' AND request_date_time <= '$request_date_to') ORDER BY id DESC";
 } else {

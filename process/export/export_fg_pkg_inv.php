@@ -23,7 +23,7 @@ $item_no = $_GET['item_no'];
 $item_name = $_GET['item_name'];
 $storage_area = $_GET['storage_area'];
 
-$sql = "SELECT `item_no`, `item_name`, `storage_area`, `quantity`, `safety_stock` FROM inventory";
+$sql = "SELECT item_no, item_name, storage_area, quantity, safety_stock FROM inventory";
 if ($storage_area == 'All') {
     $sql = $sql . " WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' ORDER BY id ASC";
 } else {

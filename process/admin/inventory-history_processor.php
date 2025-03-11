@@ -28,7 +28,7 @@ if ($method == 'count_store_in') {
 	$storage_area = $_POST['storage_area'];
 	$item_no = $_POST['item_no'];
 	$item_name = addslashes($_POST['item_name']);
-	$sql = "SELECT count(id) AS total FROM `store_in_history`";
+	$sql = "SELECT count(id) AS total FROM store_in_history";
 	if ($storage_area == 'All') {
 		$sql = $sql . " WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' AND (store_in_date_time >= '$store_in_date_from' AND store_in_date_time <= '$store_in_date_to')";
 	} else {
@@ -50,7 +50,7 @@ if ($method == 'count_store_out') {
 	$remarks = $_POST['remarks'];
 	$item_no = $_POST['item_no'];
 	$item_name = addslashes($_POST['item_name']);
-	$sql = "SELECT count(id) AS total FROM `store_out_history` WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' ";
+	$sql = "SELECT count(id) AS total FROM store_out_history WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' ";
 	if ($storage_area != 'All') {
 		$sql = $sql . "AND storage_area = '$storage_area' ";
 	}
@@ -79,7 +79,7 @@ if ($method == 'get_si_inventory_history') {
 	$c = $_POST['c'];
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-warning');
 	$row_class = $row_class_arr[0];
-	$sql = "SELECT * FROM `store_in_history`";
+	$sql = "SELECT * FROM store_in_history";
 	if (empty($id)) {
 		if ($storage_area == 'All') {
 			$sql = $sql . " WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' AND (store_in_date_time >= '$store_in_date_from' AND store_in_date_time <= '$store_in_date_to') ORDER BY id DESC LIMIT 25";
@@ -146,7 +146,7 @@ if ($method == 'get_so_inventory_history') {
 	$c = $_POST['c'];
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-warning');
 	$row_class = $row_class_arr[0];
-	$sql = "SELECT `id`, `request_id`, `item_no`, `item_name`, `storage_area`, `remarks`, `inv_out`, `inv_on_hand`, `inv_after`, `store_out_date_time` FROM `store_out_history`";
+	$sql = "SELECT id, request_id, item_no, item_name, storage_area, remarks, inv_out, inv_on_hand, inv_after, store_out_date_time FROM store_out_history";
 	if (empty($id)) {
 		$sql = $sql . " WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' ";
 	} else {
@@ -203,7 +203,7 @@ if ($method == 'update_po_no') {
 		$po_no = 'N/A';
 	}
 
-	$sql = "UPDATE `store_in_history` SET `po_no`= ? WHERE `id`= ?";
+	$sql = "UPDATE store_in_history SET po_no = ? WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($po_no, $id);
 	$stmt -> execute($params);

@@ -11,7 +11,7 @@ if (!isset($_SESSION['username'])) {
 require('../db/conn.php');
 
 $storage_area = '';
-$sql = "SELECT `storage_area` FROM storage_area ORDER BY storage_area ASC";
+$sql = "SELECT storage_area FROM storage_area ORDER BY storage_area ASC";
 
 $stmt = $conn -> prepare($sql);
 $stmt -> execute();
@@ -32,7 +32,7 @@ if ($stmt -> rowCount() > 0) {
 
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
         $storage_area = $row['storage_area'];
-        $sql1 = "SELECT `item_no`, `item_name`, `dimension`, `size`, `color`, `pcs_bundle` FROM items ORDER BY item_no ASC";
+        $sql1 = "SELECT item_no, item_name, dimension, size, color, pcs_bundle FROM items ORDER BY item_no ASC";
         $stmt1 = $conn -> prepare($sql1);
         $stmt1 -> execute();
 

@@ -35,7 +35,7 @@ $delivery_date_time = "";
 $route_no = "";
 $truck_no = "";
 
-$sql = "SELECT `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `section`, `line_no`, `route_no`, `dimension`, `size`, `color`, `quantity`, `storage_area`, `date_updated` FROM `kanban_masterlist` WHERE id = ?";
+$sql = "SELECT kanban, kanban_no, serial_no, item_no, item_name, section, line_no, route_no, dimension, size, color, quantity, storage_area, date_updated FROM kanban_masterlist WHERE id = ?";
 $stmt = $conn -> prepare($sql);
 $params = array($id);
 $stmt -> execute($params);

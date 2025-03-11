@@ -52,7 +52,7 @@ if ($method == 'get_store_out_request_history') {
 	$item_name = $_POST['item_name'];
 	$section = $_POST['section'];
 	$printing = $_POST['printing'];
-	$sql = "SELECT `id`, `request_id`, `kanban_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `route_no`, `truck_no`, `scan_date_time`, `request_date_time`, `store_out_date_time` FROM kanban_history";
+	$sql = "SELECT id, request_id, kanban_no, item_no, item_name, line_no, quantity, storage_area, section, route_no, truck_no, scan_date_time, request_date_time, store_out_date_time FROM kanban_history";
 	if (empty($id)) {
 		if ($section == 'All') {
 			$sql = $sql . " WHERE line_no LIKE '$line_no%' AND item_no LIKE '$item_no%' AND item_name LIKE '$item_name%' AND (store_out_date_time >= '$store_out_date_from' AND store_out_date_time <= '$store_out_date_to') ORDER BY id DESC LIMIT 25";

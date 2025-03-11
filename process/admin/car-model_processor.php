@@ -11,7 +11,7 @@ $method = $_POST['method'];
 
 // Get Factory Area Dropdown
 if ($method == 'fetch_car_model_dropdown') {
-	$sql = "SELECT `car_model` FROM `car_model` ORDER BY car_model ASC";
+	$sql = "SELECT car_model FROM car_model ORDER BY car_model ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {

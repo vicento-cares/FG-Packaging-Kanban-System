@@ -62,7 +62,7 @@ $section = $_GET['section'];
 	<?php
 	$c = 0;
 	$batch_no = '';
-	$sql = "SELECT `id`, `batch_no` FROM `kanban_masterlist` GROUP BY batch_no ORDER BY id DESC LIMIT 1";
+	$sql = "SELECT id, batch_no FROM kanban_masterlist GROUP BY batch_no ORDER BY id DESC LIMIT 1";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -70,7 +70,7 @@ $section = $_GET['section'];
 			$batch_no = $row['batch_no'];
 		}
 	}
-	$sql = "SELECT `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `section`, `line_no`, `route_no`, `dimension`, `size`, `color`, `quantity`, `storage_area`, `date_updated` FROM `kanban_masterlist` WHERE batch_no = ?";
+	$sql = "SELECT kanban, kanban_no, serial_no, item_no, item_name, section, line_no, route_no, dimension, size, color, quantity, storage_area, date_updated FROM kanban_masterlist WHERE batch_no = ?";
 	$params = array($batch_no);
 	if ($section != 'All') {
 		$sql = $sql . " AND section = ?";

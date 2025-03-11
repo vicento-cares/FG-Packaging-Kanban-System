@@ -32,7 +32,7 @@ $delivery_date_time = "";
 $route_no = "";
 $truck_no = "";
 
-$sql = "SELECT `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `route_no`, `truck_no`, `request_date_time`, `store_out_date_time` FROM `kanban_history` WHERE id = ?";
+$sql = "SELECT kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, section, route_no, truck_no, request_date_time, store_out_date_time FROM kanban_history WHERE id = ?";
 $stmt = $conn -> prepare($sql);
 $params = array($id);
 $stmt -> execute($params);

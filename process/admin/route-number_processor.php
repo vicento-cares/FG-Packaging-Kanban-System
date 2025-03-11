@@ -12,7 +12,7 @@ $method = $_POST['method'];
 $date_updated = date('Y-m-d H:i:s');
 
 function check_duplicate_route_no($route_no, $section, $car_model, $line_no, $factory_area, $conn) {
-	$sql = "SELECT `id` FROM `route_no` WHERE route_no = ? AND section = ? AND car_model = ? AND line_no = ? AND factory_area = ?";
+	$sql = "SELECT id FROM route_no WHERE route_no = ? AND section = ? AND car_model = ? AND line_no = ? AND factory_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($route_no, $section, $car_model, $line_no, $factory_area);
 	$stmt -> execute($params);
@@ -24,7 +24,7 @@ function check_duplicate_route_no($route_no, $section, $car_model, $line_no, $fa
 }
 
 function check_existing_route_no($line_no, $conn) {
-	$sql = "SELECT `id` FROM `route_no` WHERE line_no = ?";
+	$sql = "SELECT id FROM route_no WHERE line_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($line_no);
 	$stmt -> execute($params);
@@ -36,7 +36,7 @@ function check_existing_route_no($line_no, $conn) {
 }
 
 function check_existing_route_no_update($id, $line_no, $conn) {
-	$sql = "SELECT `id` FROM `route_no` WHERE id != ? AND line_no = ?";
+	$sql = "SELECT id FROM route_no WHERE id != ? AND line_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id, $line_no);
 	$stmt -> execute($params);
@@ -49,7 +49,7 @@ function check_existing_route_no_update($id, $line_no, $conn) {
 
 // Get Line Datalist
 if ($method == 'fetch_line_datalist') {
-	$sql = "SELECT `line_no` FROM `route_no` ORDER BY line_no ASC";
+	$sql = "SELECT line_no FROM route_no ORDER BY line_no ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -66,7 +66,7 @@ if ($method == 'get_route_details') {
 	$factory_area = '';
 
 	if (!empty($line_no)) {
-		$sql = "SELECT `line_no`, `section`, `car_model`, `factory_area` FROM `route_no` WHERE line_no = ?";
+		$sql = "SELECT line_no, section, car_model, factory_area FROM route_no WHERE line_no = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($line_no);
 		$stmt -> execute($params);
@@ -93,7 +93,7 @@ if ($method == 'get_route_details') {
 // Count
 if ($method == 'count_data') {
 	$search = $_POST['search'];
-	$sql = "SELECT count(id) AS total FROM `route_no`";
+	$sql = "SELECT count(id) AS total FROM route_no";
 	if (!empty($search)) {
 		$sql = $sql . " WHERE route_no LIKE '$search%' OR section LIKE '$search%' OR car_model LIKE '$search%' OR line_no LIKE '$search%'";
 	}
@@ -111,7 +111,7 @@ if ($method == 'fetch_data') {
 	$id = $_POST['id'];
 	$search = $_POST['search'];
 	$c = $_POST['c'];
-	$sql = "SELECT `id`, `route_no`, `section`, `car_model`, `line_no`, `factory_area`, `date_updated` FROM `route_no`";
+	$sql = "SELECT id, route_no, section, car_model, line_no, factory_area, date_updated FROM route_no";
 
 	if (!empty($id) && empty($search)) {
 		$sql = $sql . " WHERE id > '$id'";
@@ -182,7 +182,7 @@ if ($method == 'save_data') {
 		$is_existing = check_existing_route_no($line_no, $conn);
 		if ($is_duplicate == false) {
 			if ($is_existing == false) {
-				$sql = "INSERT INTO `route_no` (`route_no`, `section`, `car_model`, `line_no`, `factory_area`, `date_updated`) VALUES (?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO route_no (route_no, section, car_model, line_no, factory_area, date_updated) VALUES (?, ?, ?, ?, ?, ?)";
 				$stmt = $conn -> prepare($sql);
 				$params = array($route_no, $section, $car_model, $line_no, $factory_area, $date_updated);
 				$stmt -> execute($params);
@@ -234,7 +234,7 @@ if ($method == 'update_data') {
 	if ($is_valid == true) {
 		$is_existing = check_existing_route_no_update($id, $line_no, $conn);
 		if ($is_existing == false) {
-			$sql = "UPDATE `route_no` SET `route_no`= ?, `section`= ?, `car_model`= ?, `line_no`= ?, `factory_area`= ?, `date_updated`= ? WHERE `id`= ?";
+			$sql = "UPDATE route_no SET route_no = ?, section = ?, car_model = ?, line_no = ?, factory_area = ?, date_updated = ? WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($route_no, $section, $car_model, $line_no, $factory_area, $date_updated, $id);
 			$stmt -> execute($params);
@@ -249,7 +249,7 @@ if ($method == 'update_data') {
 if ($method == 'delete_data') {
 	$id = $_POST['id'];
 
-	$sql = "DELETE FROM `route_no` WHERE id = ?";
+	$sql = "DELETE FROM route_no WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);

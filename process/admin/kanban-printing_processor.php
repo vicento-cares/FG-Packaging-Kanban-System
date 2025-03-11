@@ -10,7 +10,7 @@ if (!isset($_POST['method'])) {
 $method = $_POST['method'];
 
 function get_batch_no_latest($conn) {
-	$sql = "SELECT `id`, `batch_no` FROM `kanban_masterlist` GROUP BY batch_no ORDER BY id DESC LIMIT 1";
+	$sql = "SELECT id, batch_no FROM kanban_masterlist GROUP BY batch_no ORDER BY id DESC LIMIT 1";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -22,7 +22,7 @@ function get_batch_no_latest($conn) {
 
 // Get Batch Dropdown
 if ($method == 'fetch_batch_dropdown') {
-	$sql = "SELECT `batch_no` FROM `kanban_masterlist` GROUP BY(batch_no) ORDER BY id ASC";
+	$sql = "SELECT batch_no FROM kanban_masterlist GROUP BY(batch_no) ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -37,7 +37,7 @@ if ($method == 'fetch_batch_dropdown') {
 
 // Get Batch Dropdown
 if ($method == 'fetch_line_dropdown') {
-	$sql = "SELECT `line_no` FROM `kanban_masterlist` GROUP BY(line_no) ORDER BY id ASC";
+	$sql = "SELECT line_no FROM kanban_masterlist GROUP BY(line_no) ORDER BY id ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -57,7 +57,7 @@ if ($method == 'fetch_kanban') {
 	$line_no = $_POST['line_no'];
 	$section = $_POST['section'];
 	$c = $_POST['c'];
-	$sql = "SELECT `id`, `item_no`, `item_name`, `section`, `line_no`, `quantity`, `storage_area`, `date_updated` FROM `kanban_masterlist`";
+	$sql = "SELECT id, item_no, item_name, section, line_no, quantity, storage_area, date_updated FROM kanban_masterlist";
 	if (!empty($id)) {
 		$sql = $sql . " WHERE id > '$id'";
 		if (!empty($batch_no) && empty($line_no)) {
@@ -126,7 +126,7 @@ if ($method == 'count_kanban') {
 	$batch_no = $_POST['batch_no'];
 	$line_no = $_POST['line_no'];
 	$section = $_POST['section'];
-	$sql = "SELECT count(id) AS total FROM `kanban_masterlist`";
+	$sql = "SELECT count(id) AS total FROM kanban_masterlist";
 	if (!empty($batch_no) && empty($line_no)) {
 		if ($section != 'All' && $batch_no != 'All') {
 			$sql = $sql . " WHERE batch_no = '$batch_no' AND section = '$section'";

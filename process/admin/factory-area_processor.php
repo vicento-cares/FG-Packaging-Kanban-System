@@ -11,7 +11,7 @@ $method = $_POST['method'];
 
 // Get Factory Area Dropdown
 if ($method == 'fetch_factory_area_dropdown') {
-	$sql = "SELECT `factory_area` FROM `factory_area` ORDER BY factory_area ASC";
+	$sql = "SELECT factory_area FROM factory_area ORDER BY factory_area ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {

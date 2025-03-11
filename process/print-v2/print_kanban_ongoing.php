@@ -66,7 +66,7 @@ $scanned_kanban_id_arr = explode(",", $_GET['scanned_kanban_id_arr']);
 	$r = 0;
 	foreach ($scanned_kanban_id_arr as $id) {
 		$c++;
-		$sql = "SELECT `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `route_no`, `request_date_time` FROM `scanned_kanban` WHERE id = ?";
+		$sql = "SELECT kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, storage_area, section, route_no, request_date_time FROM scanned_kanban WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($id);
 		$stmt -> execute($params);

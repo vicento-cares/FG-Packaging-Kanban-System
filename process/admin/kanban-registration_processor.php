@@ -17,7 +17,7 @@ if ($method == 'count_data') {
 	$line_no = $_POST['line_no'];
 	$item_no = $_POST['item_no'];
 	$item_name = addslashes($_POST['item_name']);
-	$sql = "SELECT count(id) AS total FROM `kanban_masterlist`";
+	$sql = "SELECT count(id) AS total FROM kanban_masterlist";
 	if (!empty($line_no) || !empty($item_no) || !empty($item_name)) {
 		$sql = $sql . " WHERE line_no LIKE '$line_no%' AND item_no LIKE '$item_no%' AND item_name LIKE '$item_name%'";
 	}
@@ -37,7 +37,7 @@ if ($method == 'fetch_data') {
 	$item_no = $_POST['item_no'];
 	$item_name = addslashes($_POST['item_name']);
 	$c = $_POST['c'];
-	$sql = "SELECT `id`, `batch_no`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `section`, `line_no`, `dimension`, `size`, `color`, `quantity`, `storage_area`, `req_limit`, `req_limit_qty`, `req_limit_time`, `date_updated` FROM `kanban_masterlist`";
+	$sql = "SELECT id, batch_no, kanban, kanban_no, serial_no, item_no, item_name, section, line_no, dimension, size, color, quantity, storage_area, req_limit, req_limit_qty, req_limit_time, date_updated FROM kanban_masterlist";
 
 	if (empty($id)) {
 		if (!empty($line_no) || !empty($item_no) || !empty($item_name)) {
@@ -141,7 +141,7 @@ if ($method == 'save_data') {
 			$batch_no = 'BAT:'.$batch_no;
 			$batch_no = $batch_no.''.$rand;
 
-			$sql = "INSERT INTO `kanban_masterlist` (`batch_no`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `section`, `line_no`, `route_no`, `dimension`, `size`, `color`, `quantity`, `storage_area`, `req_limit`, `req_limit_qty`, `date_updated`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			$sql = "INSERT INTO kanban_masterlist (batch_no, kanban, kanban_no, serial_no, item_no, item_name, section, line_no, route_no, dimension, size, color, quantity, storage_area, req_limit, req_limit_qty, date_updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			$stmt = $conn -> prepare($sql);
 			$params = array($batch_no, $kanban, $kanban_no, $serial_no, $item_no, $item_name, $section, $line_no, $route_no, $dimension, $size, $color, $quantity, $storage_area, $req_limit, $req_limit, $date_updated);
 			$stmt -> execute($params);
@@ -210,17 +210,17 @@ if ($method == 'update_data') {
 
 	if ($is_valid == true) {
 		$route_no = get_route_number($line_no, $conn);
-		$sql = "UPDATE `kanban_masterlist` SET `item_no`= ?, `item_name`= ?, `section`= ?, `line_no`= ?, `route_no`= ?, `dimension`= ?, `size`= ?, `color`= ?, `quantity`= ?, `storage_area`= ?, `date_updated`= ? WHERE `id`= ?";
+		$sql = "UPDATE kanban_masterlist SET item_no = ?, item_name = ?, section = ?, line_no = ?, route_no = ?, dimension = ?, size = ?, color = ?, quantity = ?, storage_area = ?, date_updated = ? WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($item_no, $item_name, $section, $line_no, $route_no, $dimension, $size, $color, $quantity, $storage_area, $date_updated, $id);
 		$stmt -> execute($params);
 
-		$sql = "SELECT `id` FROM `kanban_masterlist` WHERE item_no = ? AND line_no = ? AND req_limit = ? AND req_limit_time = ?";
+		$sql = "SELECT id FROM kanban_masterlist WHERE item_no = ? AND line_no = ? AND req_limit = ? AND req_limit_time = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($item_no, $line_no, $req_limit, $req_limit_time);
 		$stmt -> execute($params);
 		if ($stmt -> rowCount() <= 0) {
-			$sql = "UPDATE `kanban_masterlist` SET `req_limit`= ?, `req_limit_time`= ?, `date_updated`= ? WHERE item_no = ? AND line_no = ?";
+			$sql = "UPDATE kanban_masterlist SET req_limit = ?, req_limit_time = ?, date_updated = ? WHERE item_no = ? AND line_no = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($req_limit, $req_limit_time, $date_updated, $item_no, $line_no);
 			$stmt -> execute($params);
@@ -233,7 +233,7 @@ if ($method == 'update_data') {
 if ($method == 'delete_data') {
 	$id = $_POST['id'];
 
-	$sql = "DELETE FROM `kanban_masterlist` WHERE id = ?";
+	$sql = "DELETE FROM kanban_masterlist WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);

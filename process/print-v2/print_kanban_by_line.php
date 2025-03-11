@@ -66,7 +66,7 @@ $section = $_GET['section'];
 	<?php
 	$c = 0;
 	$r = 0;
-	$sql = "SELECT `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `section`, `line_no`, `route_no`, `dimension`, `size`, `color`, `quantity`, `storage_area`, `date_updated` FROM `kanban_masterlist`";
+	$sql = "SELECT kanban, kanban_no, serial_no, item_no, item_name, section, line_no, route_no, dimension, size, color, quantity, storage_area, date_updated FROM kanban_masterlist";
 	if ($section != 'All' && $line_no != 'All') {
 		$sql = $sql . " WHERE line_no = '$line_no' AND section = '$section'";
 	} else if ($section == 'All' && $line_no != 'All') {

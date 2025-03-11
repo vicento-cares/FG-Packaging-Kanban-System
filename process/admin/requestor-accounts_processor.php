@@ -14,12 +14,12 @@ $date_updated = date('Y-m-d H:i:s');
 
 // Check section of Requestor
 function check_section_requestor($id_no, $section, $ip, $conn) {
-	$sql = "SELECT `id` FROM `section` WHERE section = ? AND ip = ?";
+	$sql = "SELECT id FROM section WHERE section = ? AND ip = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($section, $ip);
 	$stmt -> execute($params);
 	if ($stmt -> rowCount() > 0) {
-		$sql = "SELECT `id_no` FROM `requestor_account` WHERE id_no = ? AND section = ?";
+		$sql = "SELECT id_no FROM requestor_account WHERE id_no = ? AND section = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($id_no, $section);
 		$stmt -> execute($params);
@@ -34,7 +34,7 @@ function check_section_requestor($id_no, $section, $ip, $conn) {
 }
 
 function check_existing_id_no($id_no, $conn) {
-	$sql = "SELECT `id_no` FROM `requestor_account` WHERE id_no = ?";
+	$sql = "SELECT id_no FROM requestor_account WHERE id_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id_no);
 	$stmt -> execute($params);
@@ -46,12 +46,12 @@ function check_existing_id_no($id_no, $conn) {
 }
 
 function change_id_no($id, $id_no, $date_updated, $conn) {
-	$sql = "SELECT `id_no` FROM `requestor_account` WHERE id_no = ?";
+	$sql = "SELECT id_no FROM requestor_account WHERE id_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id_no);
 	$stmt -> execute($params);
 	if ($stmt -> rowCount() <= 0) {
-		$sql = "UPDATE `requestor_account` SET `id_no`= ?, `date_updated`= ? WHERE `id`= ?";
+		$sql = "UPDATE requestor_account SET id_no = ?, date_updated = ? WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($id_no, $date_updated, $id);
 		$stmt -> execute($params);
@@ -64,7 +64,7 @@ function change_id_no($id, $id_no, $date_updated, $conn) {
 // Count
 if ($method == 'count_data') {
 	$search = $_POST['search'];
-	$sql = "SELECT count(id) AS total FROM `requestor_account`";
+	$sql = "SELECT count(id) AS total FROM requestor_account";
 	if (!empty($search)) {
 		$sql = $sql . " WHERE id_no LIKE '$search%' OR name LIKE '$search%' OR section LIKE '$search%' OR car_model LIKE '$search%' OR line_no LIKE '$search%' OR requestor LIKE '$search%'";
 	}
@@ -82,7 +82,7 @@ if ($method == 'fetch_data') {
 	$id = $_POST['id'];
 	$search = $_POST['search'];
 	$c = $_POST['c'];
-	$sql = "SELECT `id`, `id_no`, `name`, `section`, `car_model`, `line_no`, `factory_area`, `requestor`, `date_updated` FROM `requestor_account`";
+	$sql = "SELECT id, id_no, name, section, car_model, line_no, factory_area, requestor, date_updated FROM requestor_account";
 
 	if (!empty($id) && empty($search)) {
 		$sql = $sql . " WHERE id > '$id'";
@@ -158,7 +158,7 @@ if ($method == 'save_data') {
 	if ($is_valid == true) {
 		$is_existing = check_existing_id_no($id_no, $conn);
 		if ($is_existing == false) {
-			$sql = "INSERT INTO `requestor_account` (`id_no`, `name`, `section`, `car_model`, `line_no`, `factory_area`, `requestor`, `date_updated`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			$sql = "INSERT INTO requestor_account (id_no, name, section, car_model, line_no, factory_area, requestor, date_updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 			$stmt = $conn -> prepare($sql);
 			$params = array($id_no, $name, $section, $car_model, $line_no, $factory_area, $requestor, $date_updated);
 			$stmt -> execute($params);
@@ -223,7 +223,7 @@ if ($method == 'update_data') {
 	}
 
 	if ($is_valid == true) {
-		$sql = "UPDATE `requestor_account` SET `name`= ?, `section`= ?, `car_model`= ?, `line_no`= ?, `factory_area`= ?, `requestor`= ?, `date_updated`= ? WHERE `id`= ?";
+		$sql = "UPDATE requestor_account SET name = ?, section = ?, car_model = ?, line_no = ?, factory_area = ?, requestor = ?, date_updated = ? WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($name, $section, $car_model, $line_no, $factory_area, $requestor, $date_updated, $id);
 		$stmt -> execute($params);
@@ -235,7 +235,7 @@ if ($method == 'update_data') {
 if ($method == 'delete_data') {
 	$id = $_POST['id'];
 
-	$sql = "DELETE FROM `requestor_account` WHERE id = ?";
+	$sql = "DELETE FROM requestor_account WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);

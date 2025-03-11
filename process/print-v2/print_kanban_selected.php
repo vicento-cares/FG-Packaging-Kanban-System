@@ -66,7 +66,7 @@ $kanban_reg_id_arr = explode(",", $_GET['kanban_reg_id_arr']);
 	$r = 0;
 	foreach ($kanban_reg_id_arr as $id) {
 		$c++;
-		$sql = "SELECT `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `section`, `line_no`, `route_no`, `dimension`, `size`, `color`, `quantity`, `storage_area`, `date_updated` FROM `kanban_masterlist` WHERE id = ?";
+		$sql = "SELECT kanban, kanban_no, serial_no, item_no, item_name, section, line_no, route_no, dimension, size, color, quantity, storage_area, date_updated FROM kanban_masterlist WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($id);
 		$stmt -> execute($params);

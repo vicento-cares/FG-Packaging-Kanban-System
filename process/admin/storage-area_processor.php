@@ -12,7 +12,7 @@ $method = $_POST['method'];
 $date_updated = date('Y-m-d H:i:s');
 
 function check_existing_storage_area($storage_area, $conn) {
-	$sql = "SELECT `storage_area` FROM `storage_area` WHERE storage_area = ?";
+	$sql = "SELECT storage_area FROM storage_area WHERE storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($storage_area);
 	$stmt -> execute($params);
@@ -26,10 +26,10 @@ function check_existing_storage_area($storage_area, $conn) {
 function insert_item_on_inventory($storage_area, $conn) {
 	$quantity = 0;
 	$safety_stock = 0;
-	$sql1 = "INSERT INTO `inventory`(`item_no`, `item_name`, `storage_area`, `quantity`, `safety_stock`) VALUES ";
+	$sql1 = "INSERT INTO inventory(item_no, item_name, storage_area, quantity, safety_stock) VALUES ";
 	$subsql1 = "";
 	$temp_count = 0;
-	$sql = "SELECT `item_no`, `item_name` FROM `items`";
+	$sql = "SELECT item_no, item_name FROM items";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	$row_count = $stmt -> rowCount();
@@ -44,7 +44,7 @@ function insert_item_on_inventory($storage_area, $conn) {
 			$sql1 = substr($sql1, 0, strlen($sql1));
 			$stmt1 = $conn -> prepare($sql1);
 			$stmt1 -> execute();
-			$sql1 = "INSERT INTO `inventory`(`item_no`, `item_name`, `storage_area`, `quantity`, `safety_stock`) VALUES ";
+			$sql1 = "INSERT INTO inventory(item_no, item_name, storage_area, quantity, safety_stock) VALUES ";
 			$subsql1 = "";
 		} else if ($temp_count == $row_count) {
 			$subsql1 = substr($subsql1, 0, strlen($subsql1) - 3);
@@ -57,7 +57,7 @@ function insert_item_on_inventory($storage_area, $conn) {
 }
 
 function get_storage_area($id, $conn) {
-	$sql = "SELECT `storage_area` FROM `storage_area` WHERE id = ?";
+	$sql = "SELECT storage_area FROM storage_area WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);
@@ -67,20 +67,20 @@ function get_storage_area($id, $conn) {
 }
 
 function update_storage_area_on_kanban($storage_area, $old_storage_area, $conn) {
-	$sql = "UPDATE `kanban_masterlist` SET `storage_area` = ? WHERE storage_area = ?";
+	$sql = "UPDATE kanban_masterlist SET storage_area = ? WHERE storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($storage_area, $old_storage_area);
 	$stmt -> execute($params);
 }
 
 function update_item_on_inventory($storage_area, $old_storage_area, $conn) {
-	$sql = "SELECT `item_no`, `item_name` FROM `items`";
+	$sql = "SELECT item_no, item_name FROM items";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
 		$item_no = $row['item_no'];
 		$item_name = addslashes($row['item_name']);
-		$sql1 = "UPDATE `inventory` SET `storage_area` = ? WHERE item_no = ? AND item_name = ? AND storage_area = ?";
+		$sql1 = "UPDATE inventory SET storage_area = ? WHERE item_no = ? AND item_name = ? AND storage_area = ?";
 		$stmt1 = $conn -> prepare($sql1);
 		$params = array($storage_area, $item_no, $item_name, $old_storage_area);
 		$stmt1 -> execute($params);
@@ -90,7 +90,7 @@ function update_item_on_inventory($storage_area, $old_storage_area, $conn) {
 function check_item_on_inventory($storage_area, $conn) {
 	$total_items = 0;
 	$total_items_zero = 0;
-	$sql = "SELECT count(id) AS total FROM `inventory` WHERE storage_area = ?";
+	$sql = "SELECT count(id) AS total FROM inventory WHERE storage_area = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($storage_area);
 	$stmt -> execute($params);
@@ -98,7 +98,7 @@ function check_item_on_inventory($storage_area, $conn) {
 		$total_items = $row['total'];
 	}
 
-	$sql = "SELECT count(id) AS total FROM `inventory` WHERE storage_area = ? AND quantity = 0";
+	$sql = "SELECT count(id) AS total FROM inventory WHERE storage_area = ? AND quantity = 0";
 	$stmt = $conn -> prepare($sql);
 	$params = array($storage_area);
 	$stmt -> execute($params);
@@ -115,7 +115,7 @@ function check_item_on_inventory($storage_area, $conn) {
 
 // Get Area Dropdown
 if ($method == 'fetch_area_dropdown') {
-	$sql = "SELECT `storage_area` FROM `storage_area` GROUP BY(storage_area) ORDER BY storage_area ASC";
+	$sql = "SELECT storage_area FROM storage_area GROUP BY(storage_area) ORDER BY storage_area ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -130,7 +130,7 @@ if ($method == 'fetch_area_dropdown') {
 
 // Get Area Dropdown
 if ($method == 'fetch_area_dropdown_fg') {
-	$sql = "SELECT `storage_area` FROM `storage_area` GROUP BY(storage_area) ORDER BY storage_area ASC";
+	$sql = "SELECT storage_area FROM storage_area GROUP BY(storage_area) ORDER BY storage_area ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -146,7 +146,7 @@ if ($method == 'fetch_area_dropdown_fg') {
 // Count
 if ($method == 'count_data') {
 	$search = $_POST['search'];
-	$sql = "SELECT count(id) AS total FROM `storage_area`";
+	$sql = "SELECT count(id) AS total FROM storage_area";
 	if (!empty($search)) {
 		$sql = $sql . " WHERE storage_area LIKE '$search%'";
 	}
@@ -164,7 +164,7 @@ if ($method == 'fetch_data') {
 	$id = $_POST['id'];
 	$search = $_POST['search'];
 	$c = $_POST['c'];
-	$sql = "SELECT `id`, `storage_area`, `date_updated` FROM `storage_area`";
+	$sql = "SELECT id, storage_area, date_updated FROM storage_area";
 	
 	if (!empty($id) && empty($search)) {
 		$sql = $sql . " WHERE id > '$id'";
@@ -203,7 +203,7 @@ if ($method == 'save_data') {
 		$is_existing = check_existing_storage_area($storage_area, $conn);
 
 		if ($is_existing == false) {
-			$sql = "INSERT INTO `storage_area` (`storage_area`, `date_updated`) VALUES (?, ?)";
+			$sql = "INSERT INTO storage_area (storage_area, date_updated) VALUES (?, ?)";
 			$stmt = $conn -> prepare($sql);
 			$params = array($storage_area, $date_updated);
 			$stmt -> execute($params);
@@ -229,7 +229,7 @@ if ($method == 'update_data') {
 		$is_existing = check_existing_storage_area($storage_area, $conn);
 
 		if ($is_existing == false) {
-			$sql = "UPDATE `storage_area` SET `storage_area`= ?, `date_updated`= ? WHERE `id`= ?";
+			$sql = "UPDATE storage_area SET storage_area = ?, date_updated = ? WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($storage_area, $date_updated, $id);
 			$stmt -> execute($params);
@@ -252,12 +252,12 @@ if ($method == 'delete_data') {
 	$delete = check_item_on_inventory($storage_area, $conn);
 
 	if ($delete == true) {
-		$sql = "DELETE FROM `inventory` WHERE storage_area = ?";
+		$sql = "DELETE FROM inventory WHERE storage_area = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($storage_area);
 		$stmt -> execute($params);
 		
-		$sql = "DELETE FROM `storage_area` WHERE id = ?";
+		$sql = "DELETE FROM storage_area WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($id);
 		$stmt -> execute($params);

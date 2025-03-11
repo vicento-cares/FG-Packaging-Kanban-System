@@ -13,7 +13,7 @@ $date_updated = date('Y-m-d H:i:s');
 // Count
 if ($method == 'count_data') {
 	$search = $_POST['search'];
-	$sql = "SELECT count(id) AS total FROM `truck_no`";
+	$sql = "SELECT count(id) AS total FROM truck_no";
 	if (!empty($search)) {
 		$sql = $sql . " WHERE truck_no LIKE '$search%' OR time_from LIKE '$search%' OR time_to LIKE '$search%'";
 	}
@@ -31,7 +31,7 @@ if ($method == 'fetch_data') {
 	$id = $_POST['id'];
 	$search = $_POST['search'];
 	$c = $_POST['c'];
-	$sql = "SELECT `id`, `truck_no`, `time_from`, `time_to`, `date_updated` FROM `truck_no`";
+	$sql = "SELECT id, truck_no, time_from, time_to, date_updated FROM truck_no";
 
 	if (!empty($id) && empty($search)) {
 		$sql = $sql . " WHERE id > '$id'";
@@ -68,7 +68,7 @@ if ($method == 'save_data') {
 	$time_from = $_POST['time_from'];
 	$time_to = $_POST['time_to'];
 
-	$sql = "INSERT INTO `truck_no` (`truck_no`, `time_from`, `time_to`, `date_updated`) VALUES (?, ?, ?, ?)";
+	$sql = "INSERT INTO truck_no (truck_no, time_from, time_to, date_updated) VALUES (?, ?, ?, ?)";
 	$stmt = $conn -> prepare($sql);
 	$params = array($truck_no, $time_from, $time_to, $date_updated);
 	$stmt -> execute($params);
@@ -82,7 +82,7 @@ if ($method == 'update_data') {
 	$time_from = $_POST['time_from'];
 	$time_to = $_POST['time_to'];
 
-	$sql = "UPDATE `truck_no` SET `truck_no`= ?, `time_from`= ?, `time_to`= ?, `date_updated`= ? WHERE `id`= ?";
+	$sql = "UPDATE truck_no SET truck_no = ?, time_from = ?, time_to = ?, date_updated = ? WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($truck_no, $time_from, $time_to, $date_updated, $id);
 	$stmt -> execute($params);
@@ -93,7 +93,7 @@ if ($method == 'update_data') {
 if ($method == 'delete_data') {
 	$id = $_POST['id'];
 
-	$sql = "DELETE FROM `truck_no` WHERE id = ?";
+	$sql = "DELETE FROM truck_no WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);

@@ -15,7 +15,7 @@ require('../lib/validate.php');
 require('../lib/main.php');
 
 $start_row = 1;
-$insertsql = "INSERT INTO `kanban_masterlist` (`batch_no`, `kanban`, `kanban_no`, `serial_no`, `line_no`, `storage_area`, `item_no`, `item_name`, `dimension`, `size`, `color`, `quantity`, `req_limit`, `section`, `req_limit_qty`, `route_no`, `date_updated`) VALUES ";
+$insertsql = "INSERT INTO kanban_masterlist (batch_no, kanban, kanban_no, serial_no, line_no, storage_area, item_no, item_name, dimension, size, color, quantity, req_limit, section, req_limit_qty, route_no, date_updated) VALUES ";
 $subsql = "";
 
 $date_updated = date('Y-m-d H:i:s');
@@ -29,7 +29,7 @@ $batch_no = $batch_no.''.$rand;
 function get_items($conn) {
     $data = array();
 
-    $sql = "SELECT `item_no`, `item_name` FROM `items` ORDER BY item_no ASC";
+    $sql = "SELECT item_no, item_name FROM items ORDER BY item_no ASC";
     $stmt = $conn -> prepare($sql);
     $stmt -> execute();
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
@@ -43,7 +43,7 @@ function get_items($conn) {
 function get_lines($conn) {
     $data = array();
 
-    $sql = "SELECT `line_no` FROM `route_no` ORDER BY line_no ASC";
+    $sql = "SELECT line_no FROM route_no ORDER BY line_no ASC";
     $stmt = $conn -> prepare($sql);
     $stmt -> execute();
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
@@ -56,7 +56,7 @@ function get_lines($conn) {
 function get_storage_areas($conn) {
     $data = array();
 
-    $sql = "SELECT `storage_area` FROM `storage_area` ORDER BY storage_area ASC";
+    $sql = "SELECT storage_area FROM storage_area ORDER BY storage_area ASC";
     $stmt = $conn -> prepare($sql);
     $stmt -> execute();
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
@@ -68,7 +68,7 @@ function get_storage_areas($conn) {
 
 // Get Section
 function get_section_by_line_no($line_no, $conn) {
-    $sql = "SELECT `section` FROM `route_no` WHERE line_no = ?";
+    $sql = "SELECT section FROM route_no WHERE line_no = ?";
     $stmt = $conn -> prepare($sql);
     $params = array($line_no);
     $stmt -> execute($params);
@@ -232,7 +232,7 @@ function check_csv ($file, $conn) {
             }
 
             // CHECK ROWS IF EXISTS
-            $sql = "SELECT id FROM `kanban_masterlist` 
+            $sql = "SELECT id FROM kanban_masterlist 
             WHERE item_no = '$item_no' AND item_name = '$item_name' AND line_no = '$line_no'
             AND dimension = '$dimension' AND size = '$size' AND color = '$color'
             AND quantity = '$quantity' AND storage_area = '$storage_area'";
@@ -357,7 +357,7 @@ if (!empty($_FILES['file']['name'])) {
                             $insertsql = substr($insertsql, 0, strlen($insertsql));
                             $stmt = $conn -> prepare($insertsql);
                             $stmt -> execute();
-                            $insertsql = "INSERT INTO `kanban_masterlist` (`batch_no`, `kanban`, `kanban_no`, `serial_no`, `line_no`, `storage_area`, `item_no`, `item_name`, `dimension`, `size`, `color`, `quantity`, `req_limit`, `section`, `req_limit_qty`, `route_no`, `date_updated`) VALUES ";
+                            $insertsql = "INSERT INTO kanban_masterlist (batch_no, kanban, kanban_no, serial_no, line_no, storage_area, item_no, item_name, dimension, size, color, quantity, req_limit, section, req_limit_qty, route_no, date_updated) VALUES ";
                             $subsql = "";
                         } else if ($temp_count == $row_count) {
                             $subsql = substr($subsql, 0, strlen($subsql) - 3);

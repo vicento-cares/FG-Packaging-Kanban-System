@@ -15,7 +15,7 @@ $method = $_POST['method'];
 $date_updated = date('Y-m-d H:i:s');
 
 function check_existing_username($username, $conn) {
-	$sql = "SELECT `username` FROM `account` WHERE username = ?";
+	$sql = "SELECT username FROM account WHERE username = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($username);
 	$stmt -> execute($params);
@@ -27,7 +27,7 @@ function check_existing_username($username, $conn) {
 }
 
 function check_own_username($id, $own_username, $conn) {
-	$sql = "SELECT `username` FROM `account` WHERE id = ?";
+	$sql = "SELECT username FROM account WHERE id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id);
 	$stmt -> execute($params);
@@ -41,12 +41,12 @@ function check_own_username($id, $own_username, $conn) {
 }
 
 function change_username($id, $username, $date_updated, $conn) {
-	$sql = "SELECT `username` FROM `account` WHERE username = ?";
+	$sql = "SELECT username FROM account WHERE username = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($username);
 	$stmt -> execute($params);
 	if ($stmt -> rowCount() <= 0) {
-		$sql = "UPDATE `account` SET `username`= ?, `date_updated`= ? WHERE id = ?";
+		$sql = "UPDATE account SET username = ?, date_updated = ? WHERE id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($username, $date_updated, $id);
 		$stmt -> execute($params);
@@ -59,7 +59,7 @@ function change_username($id, $username, $date_updated, $conn) {
 // Count
 if ($method == 'count_data') {
 	$search = $_POST['search'];
-	$sql = "SELECT count(id) AS total FROM `account`";
+	$sql = "SELECT count(id) AS total FROM account";
 	if (!empty($search)) {
 		$sql = $sql . " WHERE username LIKE '$search%' OR name LIKE '$search%' OR role LIKE '$search%'";
 	}
@@ -82,7 +82,7 @@ if ($method == 'fetch_data') {
 	$own_name = $_COOKIE['name'];
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-primary');
 	$row_class = $row_class_arr[0];
-	$sql = "SELECT `id`, `username`, `password`, `name`, `role`, `date_updated` FROM `account`";
+	$sql = "SELECT id, username, password, name, role, date_updated FROM account";
 
 	if (!empty($id) && empty($search)) {
 		$sql = $sql . " WHERE id > '$id'";
@@ -152,7 +152,7 @@ if ($method == 'save_data') {
 		if ($own_role == 'Admin') {
 			$is_existing = check_existing_username($username, $conn);
 			if ($is_existing == false) {
-				$sql = "INSERT INTO `account` (`username`, `password`, `name`, `role`, `date_updated`) VALUES (?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO account (username, password, name, role, date_updated) VALUES (?, ?, ?, ?, ?)";
 				$stmt = $conn -> prepare($sql);
 				$params = array($username, $password, $name, $role, $date_updated);
 				$stmt -> execute($params);
@@ -208,7 +208,7 @@ if ($method == 'update_password') {
 		if ($own_role != 'Admin' && $is_own_username == false) {
 			echo 'Unauthorized Access';
 		} else {
-			$sql = "UPDATE `account` SET `password`= ?, `date_updated`= ? WHERE id = ?";
+			$sql = "UPDATE account SET password = ?, date_updated = ? WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($password, $date_updated, $id);
 			$stmt -> execute($params);
@@ -246,7 +246,7 @@ if ($method == 'update_data') {
 			if ($is_own_username == true && $role != 'Admin') {
 				echo 'Own Account';
 			} else {
-				$sql = "UPDATE `account` SET `name`= ?, `role`= ?, `date_updated`= ? WHERE `id`= ?";
+				$sql = "UPDATE account SET name = ?, role = ?, date_updated = ? WHERE id = ?";
 				$stmt = $conn -> prepare($sql);
 				$params = array($name, $role, $date_updated, $id);
 				$stmt -> execute($params);
@@ -262,7 +262,7 @@ if ($method == 'update_data') {
 			} else if ($is_own_username == false) {
 				echo 'Unauthorized Access';
 			} else {
-				$sql = "UPDATE `account` SET `name`= ?, `date_updated`= ? WHERE `id`= ?";
+				$sql = "UPDATE account SET name = ?, date_updated = ? WHERE id = ?";
 				$stmt = $conn -> prepare($sql);
 				$params = array($name, $date_updated, $id);
 				$stmt -> execute($params);
@@ -285,7 +285,7 @@ if ($method == 'delete_data') {
 
 	if ($is_own_username == false) {
 		if ($own_role == 'Admin') {
-			$sql = "DELETE FROM `account` WHERE id = ?";
+			$sql = "DELETE FROM account WHERE id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($id);
 			$stmt -> execute($params);

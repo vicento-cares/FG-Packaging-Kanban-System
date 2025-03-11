@@ -10,7 +10,7 @@ require('../lib/main.php');
 function check_section_requestor($id_no, $ip, $conn) {
 	$section = check_ip_section($ip, $conn);
 	if (!empty($section)) {
-		$sql = "SELECT `id` FROM `requestor_account` WHERE id_no = ? AND section = ?";
+		$sql = "SELECT id FROM requestor_account WHERE id_no = ? AND section = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($id_no, $section);
 		$stmt -> execute($params);
@@ -35,7 +35,7 @@ if (!isset($_POST['id_no']) && !isset($_POST['ip'])) {
 	$requestor = '';
 	$check_section_requestor = '';
 
-	$sql = "SELECT `id_no`, `name`, `requestor` FROM `requestor_account` WHERE id_no = BINARY convert(? using utf8mb4) collate utf8mb4_bin";
+	$sql = "SELECT id_no, name, requestor FROM requestor_account WHERE id_no = BINARY convert(? using utf8mb4) collate utf8mb4_bin";
 	$stmt = $conn -> prepare($sql);
 	$params = array($id_no);
 	$stmt -> execute($params);

@@ -31,7 +31,7 @@ $item_no = $_GET['item_no'];
 $item_name = $_GET['item_name'];
 $storage_area = $_GET['storage_area'];
 
-$sql = "SELECT * FROM `store_in_history`";
+$sql = "SELECT * FROM store_in_history";
 if ($storage_area == 'All') {
     $sql = $sql . " WHERE item_no LIKE '%$item_no%' AND item_name LIKE '$item_name%' AND (store_in_date_time >= '$store_in_date_from' AND store_in_date_time <= '$store_in_date_to') ORDER BY id DESC";
 } else {

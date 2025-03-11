@@ -37,7 +37,7 @@ function check_scanned($scanned) {
 
 // Check Duplicated Scanned Kanban
 function check_duplicated_scan($scanned, $request_id, $conn) {
-	$sql = "SELECT `id` FROM `scanned_kanban`";
+	$sql = "SELECT id FROM scanned_kanban";
 	if (check_scanned($scanned) == "Serial No.") {
 		$sql = $sql . " WHERE serial_no = ? AND request_id = ? AND status = 'Scanned' LIMIT 1";
 	} else {
@@ -55,7 +55,7 @@ function check_duplicated_scan($scanned, $request_id, $conn) {
 
 // Check Already Requested Kanban
 function check_already_scan($scanned, $request_id, $conn) {
-	$sql = "SELECT `id` FROM `scanned_kanban`";
+	$sql = "SELECT id FROM scanned_kanban";
 	if (check_scanned($scanned) == "Serial No.") {
 		$sql = $sql . " WHERE serial_no = ? AND request_id != ? AND status != 'Scanned' LIMIT 1";
 	} else {
@@ -73,7 +73,7 @@ function check_already_scan($scanned, $request_id, $conn) {
 
 // Check Registered Kanban
 function check_registered_scan($scanned, $conn) {
-	$sql = "SELECT `id` FROM `kanban_masterlist`";
+	$sql = "SELECT id FROM kanban_masterlist";
 	if (check_scanned($scanned) == "Serial No.") {
 		$sql = $sql . " WHERE serial_no = ?";
 	} else {
@@ -91,7 +91,7 @@ function check_registered_scan($scanned, $conn) {
 
 // Check Section of Kanban
 function check_section_scan($scanned, $section, $conn) {
-	$sql = "SELECT `id` FROM `kanban_masterlist`";
+	$sql = "SELECT id FROM kanban_masterlist";
 	if (check_scanned($scanned) == "Serial No.") {
 		$sql = $sql . " WHERE serial_no = ? AND section = ?";
 	} else {
@@ -109,7 +109,7 @@ function check_section_scan($scanned, $section, $conn) {
 
 // Check Line No of Kanban
 function check_line_scan($scanned, $section, $conn) {
-	$sql = "SELECT `line_no` FROM `kanban_masterlist`";
+	$sql = "SELECT line_no FROM kanban_masterlist";
 	if (check_scanned($scanned) == "Serial No.") {
 		$sql = $sql . " WHERE serial_no = ? AND section = ?";
 	} else {
@@ -122,11 +122,11 @@ function check_line_scan($scanned, $section, $conn) {
 		$line_no = $row['line_no'];
 	}
 
-	$sql = "SELECT `id` FROM `scanned_kanban` WHERE status = 'Scanned'";
+	$sql = "SELECT id FROM scanned_kanban WHERE status = 'Scanned'";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
-		$sql = "SELECT `id` FROM `scanned_kanban` WHERE section = ? AND line_no = ? AND status = 'Scanned'";
+		$sql = "SELECT id FROM scanned_kanban WHERE section = ? AND line_no = ? AND status = 'Scanned'";
 		$stmt = $conn -> prepare($sql);
 		$params = array($section, $line_no);
 		$stmt -> execute($params);
@@ -144,7 +144,7 @@ function check_line_scan($scanned, $section, $conn) {
 function check_single_item_scan($scanned, $section, $conn) {
 	$item_no = '';
 	$line_no = '';
-	$sql = "SELECT `item_no`, `line_no` FROM `kanban_masterlist`";
+	$sql = "SELECT item_no, line_no FROM kanban_masterlist";
 
 	if (check_scanned($scanned) == "Serial No.") {
 		$sql = $sql . " WHERE serial_no = ?";
@@ -159,7 +159,7 @@ function check_single_item_scan($scanned, $section, $conn) {
 		$line_no = $row['line_no'];
 	}
 
-	$sql = "SELECT `id` FROM `scanned_kanban` WHERE section = ? AND item_no = ? AND line_no = ? AND status = 'Scanned'";
+	$sql = "SELECT id FROM scanned_kanban WHERE section = ? AND item_no = ? AND line_no = ? AND status = 'Scanned'";
 	$stmt = $conn -> prepare($sql);
 	$params = array($section, $item_no, $line_no);
 	$stmt -> execute($params);
@@ -176,7 +176,7 @@ function check_request_limit_scan($scanned, $conn) {
 	$req_limit_qty = 0;
 	$req_limit_time = '';
 	$req_limit_date = '';
-	$sql = "SELECT `quantity`, `req_limit_qty`, `req_limit_time`, `req_limit_date` FROM `kanban_masterlist`";
+	$sql = "SELECT quantity, req_limit_qty, req_limit_time, req_limit_date FROM kanban_masterlist";
 	if (check_scanned($scanned) == "Serial No.") {
 		$sql = $sql . " WHERE serial_no = ?";
 	} else {
@@ -211,7 +211,7 @@ function check_request_limit_scan($scanned, $conn) {
 function insert_scanned($scanned, $request_id, $requestor_arr, $conn) {
 	$scan_date_time = date('Y-m-d H:i:s');
 	$request_arr = array();
-	$sql = "SELECT `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `section`, `route_no`, `quantity`, `storage_area` FROM `kanban_masterlist`";
+	$sql = "SELECT kanban, kanban_no, serial_no, item_no, item_name, line_no, section, route_no, quantity, storage_area FROM kanban_masterlist";
 	if (check_scanned($scanned) == "Serial No.") {
 		$sql = $sql . " WHERE serial_no = ?";
 	} else {
@@ -227,7 +227,7 @@ function insert_scanned($scanned, $request_id, $requestor_arr, $conn) {
 		}
 	}
 	
-	$sql = "INSERT INTO `scanned_kanban`(`request_id`, `kanban`, `kanban_no`, `serial_no`,  `item_no`, `item_name`, `line_no`, `quantity`, `storage_area`, `section`, `route_no`, `requestor_id_no`, `requestor_name`, `requestor`, `scan_date_time`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Scanned')";
+	$sql = "INSERT INTO scanned_kanban(request_id, kanban, kanban_no, serial_no,  item_no, item_name, line_no, quantity, storage_area, section, route_no, requestor_id_no, requestor_name, requestor, scan_date_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Scanned')";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute($request_arr);
 	return 'success';
@@ -241,7 +241,7 @@ function display_scanned($request_id, $conn) {
 	$row_class_arr = array('modal-trigger', 'modal-trigger table-primary', 'modal-trigger table-warning', 'modal-trigger table-success', 'modal-trigger table-danger');
 	$row_class = $row_class_arr[0];
 	$is_history = false;
-	$sql = "SELECT `id`, `request_id`, `kanban`, `kanban_no`, `serial_no`, `item_no`, `item_name`, `line_no`, `quantity`, `section`, `requestor_name`, `scan_date_time` FROM `scanned_kanban` WHERE request_id = ? ORDER BY id DESC";
+	$sql = "SELECT id, request_id, kanban, kanban_no, serial_no, item_no, item_name, line_no, quantity, section, requestor_name, scan_date_time FROM scanned_kanban WHERE request_id = ? ORDER BY id DESC";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
@@ -252,7 +252,7 @@ function display_scanned($request_id, $conn) {
 			$serial_no = $row['serial_no'];
 			$quantity = intval($row['quantity']);
 			$has_requestor_remarks = check_requestor_remarks($request_id, $kanban, $serial_no, $conn);
-			$sql1 = "SELECT `quantity`, `req_limit_qty`, `req_limit_time`, `req_limit_date` FROM `kanban_masterlist` WHERE kanban = ? AND serial_no = ?";
+			$sql1 = "SELECT quantity, req_limit_qty, req_limit_time, req_limit_date FROM kanban_masterlist WHERE kanban = ? AND serial_no = ?";
 			$stmt1 = $conn -> prepare($sql1);
 			$params1 = array($kanban, $serial_no);
 			$stmt1 -> execute($params1);
@@ -414,7 +414,7 @@ if ($method == 'quantity_details_section') {
 	$req_limit_qty = 0;
 	$req_limit_time = '';
 	$req_limit_date = '';
-	$sql = "SELECT `kanban`, `serial_no` FROM `scanned_kanban` WHERE request_id = ? AND id = ?";
+	$sql = "SELECT kanban, serial_no FROM scanned_kanban WHERE request_id = ? AND id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id, $id);
 	$stmt -> execute($params);
@@ -425,7 +425,7 @@ if ($method == 'quantity_details_section') {
 		}
 	}
 
-	$sql = "SELECT `quantity`, `req_limit_qty`, `req_limit_time`, `req_limit_date` FROM `kanban_masterlist` WHERE kanban = ? AND serial_no = ?";
+	$sql = "SELECT quantity, req_limit_qty, req_limit_time, req_limit_date FROM kanban_masterlist WHERE kanban = ? AND serial_no = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($kanban, $serial_no);
 	$stmt -> execute($params);
@@ -455,7 +455,7 @@ if ($method == 'update_request_quantity') {
 	$serial_no = '';
 	$old_quantity = 0;
 	if ($quantity != '' && $quantity > 0) {
-		$sql = "SELECT `kanban`, `serial_no` FROM `scanned_kanban` WHERE request_id = ? AND id = ?";
+		$sql = "SELECT kanban, serial_no FROM scanned_kanban WHERE request_id = ? AND id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($request_id, $id);
 		$stmt -> execute($params);
@@ -466,7 +466,7 @@ if ($method == 'update_request_quantity') {
 			}
 		}
 
-		$sql = "SELECT `quantity` FROM `kanban_masterlist` WHERE kanban = ? AND serial_no = ?";
+		$sql = "SELECT quantity FROM kanban_masterlist WHERE kanban = ? AND serial_no = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($kanban, $serial_no);
 		$stmt -> execute($params);
@@ -475,7 +475,7 @@ if ($method == 'update_request_quantity') {
 		}
 
 		if ($quantity <= $old_quantity) {
-			$sql = "UPDATE `scanned_kanban` SET quantity = ? WHERE request_id = ? AND id = ?";
+			$sql = "UPDATE scanned_kanban SET quantity = ? WHERE request_id = ? AND id = ?";
 			$stmt = $conn -> prepare($sql);
 			$params = array($quantity, $request_id, $id);
 			$stmt -> execute($params);
@@ -497,7 +497,7 @@ if ($method == 'delete_single_scanned') {
 	$serial_no = '';
 	$section = '';
 	$scan_date_time = '';
-	$sql = "SELECT `kanban`, `kanban_no`, `serial_no`, `section`, `scan_date_time` FROM `scanned_kanban` WHERE request_id = ? AND id = ?";
+	$sql = "SELECT kanban, kanban_no, serial_no, section, scan_date_time FROM scanned_kanban WHERE request_id = ? AND id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id, $id);
 	$stmt -> execute($params);
@@ -511,12 +511,12 @@ if ($method == 'delete_single_scanned') {
 		}
 	}
 
-	$sql = "DELETE FROM `scanned_kanban` WHERE request_id = ? AND id = ?";
+	$sql = "DELETE FROM scanned_kanban WHERE request_id = ? AND id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id, $id);
 	$stmt -> execute($params);
 
-	$sql = "DELETE FROM `requestor_remarks` WHERE request_id = ? AND kanban = ? AND kanban_no = ? AND serial_no = ? AND section = ? AND scan_date_time = ?";
+	$sql = "DELETE FROM requestor_remarks WHERE request_id = ? AND kanban = ? AND kanban_no = ? AND serial_no = ? AND section = ? AND scan_date_time = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id, $kanban, $kanban_no, $serial_no, $section, $scan_date_time);
 	$stmt -> execute($params);
@@ -541,7 +541,7 @@ if ($method == 'update_scanned') {
 	$req_limit_time = '';
 	$req_limit_date = '';
 
-	$sql = "SELECT `kanban`, `serial_no`, `quantity` FROM `scanned_kanban` WHERE request_id = ?";
+	$sql = "SELECT kanban, serial_no, quantity FROM scanned_kanban WHERE request_id = ?";
 	$stmt = $conn -> prepare($sql);
 	$params = array($request_id);
 	$stmt -> execute($params);
@@ -551,7 +551,7 @@ if ($method == 'update_scanned') {
 		$quantity = intval($row['quantity']);
 		$has_requestor_remarks = check_requestor_remarks($request_id, $kanban, $serial_no, $conn);
 
-		$sql1 = "SELECT `item_no`, `line_no`, `quantity`, `req_limit`, `req_limit_qty`, `req_limit_time`, `req_limit_date` FROM `kanban_masterlist` WHERE kanban = ? AND serial_no = ?";
+		$sql1 = "SELECT item_no, line_no, quantity, req_limit, req_limit_qty, req_limit_time, req_limit_date FROM kanban_masterlist WHERE kanban = ? AND serial_no = ?";
 		$stmt1 = $conn -> prepare($sql1);
 		$params = array($kanban, $serial_no);
 		$stmt1 -> execute($params);
@@ -586,7 +586,7 @@ if ($method == 'update_scanned') {
 	} else if ($has_remarks == false) {
 		echo 'No Remarks';
 	} else {
-		$sql = "SELECT `kanban`, `serial_no`, `quantity` FROM `scanned_kanban` WHERE request_id = ?";
+		$sql = "SELECT kanban, serial_no, quantity FROM scanned_kanban WHERE request_id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($request_id);
 		$stmt -> execute($params);
@@ -602,7 +602,7 @@ if ($method == 'update_scanned') {
 			$req_limit_time = '';
 			$req_limit_date = '';
 
-			$sql1 = "SELECT `item_no`, `line_no`, `req_limit`, `req_limit_qty`, `req_limit_time`, `req_limit_date` FROM `kanban_masterlist` WHERE kanban = ? AND serial_no = ?";
+			$sql1 = "SELECT item_no, line_no, req_limit, req_limit_qty, req_limit_time, req_limit_date FROM kanban_masterlist WHERE kanban = ? AND serial_no = ?";
 			$stmt1 = $conn -> prepare($sql1);
 			$params = array($kanban, $serial_no);
 			$stmt1 -> execute($params);
@@ -629,23 +629,23 @@ if ($method == 'update_scanned') {
 
 			$req_limit_qty = $req_limit_qty - $quantity;
 
-			$sql1 = "UPDATE `kanban_masterlist` SET req_limit_qty = ?, req_limit_date = ? WHERE item_no = ? AND line_no = ?";
+			$sql1 = "UPDATE kanban_masterlist SET req_limit_qty = ?, req_limit_date = ? WHERE item_no = ? AND line_no = ?";
 			$stmt1 = $conn -> prepare($sql1);
 			$params = array($req_limit_qty, $req_limit_date, $item_no, $line_no);
 			$stmt1 -> execute($params);
 		}
 		
-		$sql = "UPDATE `scanned_kanban` SET requestor_id_no = ?, requestor_name = ?, requestor = ?, request_date_time = ?, status = 'Pending' WHERE request_id = ?";
+		$sql = "UPDATE scanned_kanban SET requestor_id_no = ?, requestor_name = ?, requestor = ?, request_date_time = ?, status = 'Pending' WHERE request_id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($requestor_id_no, $requestor_name, $requestor, $request_date_time, $request_id);
 		$stmt -> execute($params);
 
-		$sql = "UPDATE `requestor_remarks` SET request_date_time = ?, requestor_status = 'Requested' WHERE request_id = ?";
+		$sql = "UPDATE requestor_remarks SET request_date_time = ?, requestor_status = 'Requested' WHERE request_id = ?";
 		$stmt = $conn -> prepare($sql);
 		$params = array($request_date_time, $request_id);
 		$stmt -> execute($params);
 
-		$sql = "UPDATE `notification_count` SET pending = pending + 1 WHERE interface = 'ADMIN-FG'";
+		$sql = "UPDATE notification_count SET pending = pending + 1 WHERE interface = 'ADMIN-FG'";
 		$stmt = $conn -> prepare($sql);
 		$stmt -> execute();
 		echo 'success';
