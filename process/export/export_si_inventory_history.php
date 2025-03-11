@@ -5,7 +5,7 @@ session_start();
 
 if (!isset($_SESSION['username'])) {
     header('location:../../admin/');
-    exit;
+    exit();
 }
 
 require('../db/conn.php');
@@ -17,7 +17,7 @@ switch (true) {
     case !isset($_GET['item_name']):
     case !isset($_GET['storage_area']):
         echo 'Query Parameters Not Set';
-        exit;
+        exit();
         break;
 }
 

@@ -6,7 +6,7 @@ session_start();
 
 if (!isset($_SESSION['username'])) {
     header('location:../../admin/');
-    exit;
+    exit();
 }
 
 require('../db/conn.php');
@@ -14,7 +14,7 @@ require('../lib/main.php');
 
 if (!isset($_GET['scanned_kanban_id_arr'])) {
     echo 'Query Parameters Not Set';
-    exit;
+    exit();
 }
 
 $scanned_kanban_id_arr = [];

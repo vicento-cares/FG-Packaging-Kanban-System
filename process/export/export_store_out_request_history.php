@@ -5,7 +5,7 @@ session_start();
 
 if (!isset($_SESSION['username'])) {
     header('location:../../admin/');
-    exit;
+    exit();
 }
 
 require('../db/conn.php');
@@ -20,7 +20,7 @@ switch (true) {
     case !isset($_GET['section']):
     case !isset($_GET['with_remarks']):
         echo 'Query Parameters Not Set';
-        exit;
+        exit();
         break;
 }
 

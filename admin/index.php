@@ -5,7 +5,7 @@ session_start();
 
 if (isset($_SESSION['username'])) {
   header('location:pages/requested-packaging-materials.php');
-  exit;
+  exit();
 }
 ?>
 <!DOCTYPE html>

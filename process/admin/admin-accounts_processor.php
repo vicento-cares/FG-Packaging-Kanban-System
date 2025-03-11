@@ -9,7 +9,7 @@ require('../lib/validate.php');
 
 if (!isset($_POST['method'])) {
     echo 'method not set';
-    exit;
+    exit();
 }
 $method = $_POST['method'];
 $date_updated = date('Y-m-d H:i:s');

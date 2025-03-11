@@ -5,7 +5,7 @@ session_start();
 
 if (!isset($_SESSION['username'])) {
     header('location:../../admin/');
-    exit;
+    exit();
 }
 
 error_reporting(0); // comment this line to see errors

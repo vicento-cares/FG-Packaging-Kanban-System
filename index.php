@@ -7,7 +7,7 @@ require('process/lib/main.php');
 
 if (isset($_SESSION['id_no'])) {
   header('location:pages/request.php');
-  exit;
+  exit();
 } else {
   //$ip = $_SERVER['REMOTE_ADDR']; // Uncomment when deployed to production
   $ip = '172.25.112.131'; // Section 1

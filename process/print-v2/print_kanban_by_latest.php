@@ -6,7 +6,7 @@ session_start();
 
 if (!isset($_SESSION['username'])) {
     header('location:../../admin/');
-    exit;
+    exit();
 }
 
 require('../db/conn.php');
@@ -14,7 +14,7 @@ require('../lib/main.php');
 
 if (!isset($_GET['section'])) {
     echo 'Query Parameters Not Set';
-    exit;
+    exit();
 }
 
 $section = $_GET['section'];

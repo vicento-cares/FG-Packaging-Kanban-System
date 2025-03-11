@@ -5,7 +5,7 @@ require('../db/conn.php');
 
 if (!isset($_POST['method'])) {
     echo 'method not set';
-    exit;
+    exit();
 }
 $method = $_POST['method'];
 
