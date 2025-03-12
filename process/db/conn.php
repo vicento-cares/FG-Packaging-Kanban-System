@@ -2,7 +2,7 @@
 $host = 'localhost';
 $user = 'root';
 $password = '';
-$database = 'fg_packaging_debug';
+$database = 'fg_packaging';
 $port = 3306;
 
 try {
