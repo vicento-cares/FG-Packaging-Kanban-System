@@ -11,11 +11,11 @@ if (!isset($_POST['method'])) {
 $method = $_POST['method'];
 $date_updated = date('Y-m-d H:i:s');
 
-function check_duplicate_section($section, $ip, $conn)
+function check_duplicate_section($ip, $conn)
 {
-    $sql = "SELECT id FROM section WHERE section = ? AND ip = ?";
+    $sql = "SELECT id FROM section WHERE ip = ?";
     $stmt = $conn->prepare($sql);
-    $params = array($section, $ip);
+    $params = array($ip);
     $stmt->execute($params);
     if ($stmt->rowCount() > 0) {
         return true;
@@ -24,11 +24,24 @@ function check_duplicate_section($section, $ip, $conn)
     }
 }
 
-function check_existing_section_ip($id, $ip, $conn)
+function check_existing_section_ip($id, $section, $ip, $conn)
 {
-    $sql = "SELECT id FROM section WHERE id != ? AND ip = ?";
+    $sql = "SELECT id FROM section WHERE id != ? AND section = ? AND ip = ?";
     $stmt = $conn->prepare($sql);
-    $params = array($id, $ip);
+    $params = array($id, $section, $ip);
+    $stmt->execute($params);
+    if ($stmt->rowCount() > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function check_existing_section_after_update($section, $conn)
+{
+    $sql = "SELECT id FROM section WHERE section = ?";
+    $stmt = $conn->prepare($sql);
+    $params = array($section);
     $stmt->execute($params);
     if ($stmt->rowCount() > 0) {
         return true;
@@ -179,12 +192,13 @@ if ($method == 'save_data') {
     }
 
     if ($is_valid == true) {
-        $is_duplicate = check_duplicate_section($section, $ip, $conn);
+        $is_duplicate = check_duplicate_section($ip, $conn);
         if ($is_duplicate == false) {
             $sql = "INSERT INTO section (section, ip, date_updated) VALUES (?, ?, ?)";
             $stmt = $conn->prepare($sql);
             $params = array($section, $ip, $date_updated);
             $stmt->execute($params);
+            
             insert_section_on_notif($section, $conn);
             echo 'success';
         } else {
@@ -215,14 +229,18 @@ if ($method == 'update_data') {
 
     if ($is_valid == true) {
         $old_section = get_section($id, $conn);
-        $is_existing = check_existing_section_ip($id, $ip, $conn);
+        $is_existing = check_existing_section_ip($id, $section, $ip, $conn);
         if ($is_existing == false) {
             $sql = "UPDATE section SET section = ?, ip = ?, date_updated = ? WHERE section = ?";
             $stmt = $conn->prepare($sql);
             $params = array($section, $ip, $date_updated, $old_section);
             $stmt->execute($params);
-            update_section_on_kanban($section, $old_section, $conn);
-            update_section_on_notif($section, $old_section, $conn);
+
+            $is_existing = check_existing_section_after_update($old_section, $conn);
+            if ($is_existing == false) {
+                update_section_on_kanban($section, $old_section, $conn);
+                update_section_on_notif($section, $old_section, $conn);
+            }
             echo 'success';
         } else {
             echo 'Already Exists';

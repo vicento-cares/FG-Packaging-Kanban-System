@@ -16,7 +16,7 @@
               <!-- text input -->
               <div class="form-group">
                 <label>Section</label><label style="color: red;">*</label>
-                <input type="text" class="form-control" id="u_section" maxlength="255" disabled>
+                <input type="text" class="form-control" id="u_section" maxlength="255" required>
               </div>
             </div>
           </div>
